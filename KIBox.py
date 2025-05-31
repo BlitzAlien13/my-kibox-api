@@ -66,7 +66,7 @@ class KIBox:
         """Löscht den Gesprächsverlauf"""
         self.conversation = []
     
-    def start_conversation(self):
+    """ def start_conversation(self):
         while True:
             print("In welchem Bereich soll ich dir helfen?\n")
             AuswahlBerreich = input("1. Hauptfächer\n2. Gesellschaftswissenschaften\n3. Naturwissenschaften\n4. Sprachen\n5. Kunst und Musik\n6. Weitere Fächer\n7. quit\n")
@@ -303,12 +303,12 @@ class KIBox:
                         print(antwort)
 
             else:
-                print("Keine gültige Eingabe!\n")
+                print("Keine gültige Eingabe!\n")"""
 
         
 
 
 kibox = KIBox(kibox_instance=None)
 if kibox.login("lorenc", "blitz-alien"):
-   kibox.start_conversation()
+   """kibox.start_conversation()"""
 
