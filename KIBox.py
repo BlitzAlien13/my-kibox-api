@@ -1,5 +1,4 @@
 import requests
-import json
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
