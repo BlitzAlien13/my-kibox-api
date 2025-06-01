@@ -22,4 +22,4 @@ async def chat(request: Request):
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = kibox.chat(message)
-    return {"response": response}
+    return {"reply": response}
