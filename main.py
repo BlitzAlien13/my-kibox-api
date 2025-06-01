@@ -11,8 +11,8 @@ def root():
 @app.post("/login")
 async def login(request: Request):
     data = await request.json()
-    username = data.get("username")
-    password = data.get("password")
+    username = "lorenc"
+    password = "blitz-alien"
     return kibox.login(username, password)
 
 @app.post("/chat")
