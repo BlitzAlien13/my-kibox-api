@@ -5,6 +5,11 @@ app = FastAPI()
 kibox = KIBox(kibox_instance=None)
 
 @app.get("/")
+
+@app.on_event("startup")
+async def startup_event():
+    kibox.login("lorenc", "blitz-alien")
+    
 def root():
     return {"message": "KIBox API ist bereit 🎉"}
 
