@@ -66,7 +66,7 @@ class KIBox:
         """Löscht den Gesprächsverlauf"""
         self.conversation = []
     
-    def start_conversation(self):
+    """def start_conversation(self):
         while True:
             print("In welchem Bereich soll ich dir helfen?\n")
             AuswahlBerreich = input("1. Hauptfächer\n2. Gesellschaftswissenschaften\n3. Naturwissenschaften\n4. Sprachen\n5. Kunst und Musik\n6. Weitere Fächer\n7. quit\n")
@@ -108,7 +108,7 @@ class KIBox:
 
             elif AuswahlBerreich == "2" or AuswahlBerreich.lower() == "gesellschaftwissenschaften":
                 print("Wähle ein Fach:\n")
-                AuswahlGesellschaftwissenschaften = input("1. Geschichte\n2. Erdkunde\n3. Politik-Wirtschaft\n4. Religion\n5. Werte und Normen\n6. Philosophie")
+                AuswahlGesellschaftwissenschaften = input("1. Geschichte\n2. Erdkunde\n3. Politik-Wirtschaft\n4. Religion\n5. Werte und Normen\n6. Philosophie\n")
 
                 if AuswahlGesellschaftwissenschaften == "1" or AuswahlGesellschaftwissenschaften.lower() == "geschichte":
                     kibox.add_system_message("Du bist ein hilfreicher Assistent für Schüler, die Fragen zum Fach Geschichte haben.")
@@ -303,12 +303,12 @@ class KIBox:
                         print(antwort)
 
             else:
-                print("Keine gültige Eingabe!\n")
+                print("Keine gültige Eingabe!\n")"""
 
         
 
 
 kibox = KIBox(kibox_instance=None)
 if kibox.login("lorenc", "blitz-alien"):
-   kibox.start_conversation()
+   """kibox.start_conversation()"""
 
