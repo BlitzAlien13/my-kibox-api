@@ -47,3 +47,14 @@ async def wiki(request: Request):
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.news_checker(message)
     return {"reply": response}
+
+
+@app.post("/similar")
+async def similar(request: Request):
+    data = await request.json()
+    message = data.get("message")
+    if not kibox.token:
+        return {"error": "Bitte zuerst einloggen (/login)"}
+    raw = news.similar(message)
+    response = [b.strip() for b in raw.split(",")]
+    return {"reply": response}
