@@ -95,6 +95,10 @@ class FakeNews:
         """Fügt eine System-Nachricht hinzu (z.B. Anweisungen)"""
         self.conversation.append({"role": "system", "content": content})
 
+    def clear_conversation(self):
+        """Löscht den Gesprächsverlauf"""
+        self.conversation = []
+
     def extract_important(self, text):
         extract = requests.post(
             f"{self.api_url}/api/keyterms/extract",
@@ -113,6 +117,7 @@ class FakeNews:
             print(f"✗ (extract) Fehler: {extract.status_code}")
 
     def news_checker(self, message, temperature=0.7, max_tokens=500):
+        self.clear_conversation()
         #Führt ein Gespräch mit Verlauf
         # Benutzer-Nachricht hinzufügen
         self.conversation.append({"role": "user", "content": message})
