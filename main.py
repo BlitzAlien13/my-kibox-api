@@ -21,6 +21,7 @@ news = FakeNews(kibox_instance=None)
 @app.on_event("startup")
 async def startup_event():
     kibox.login("lorenc", "blitz-alien")
+    news.login("lorenc", "blitz-alien")
 
 @app.post("/login")
 async def login(request: Request):
