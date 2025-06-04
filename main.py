@@ -44,6 +44,5 @@ async def wiki(request: Request):
     message = data.get("message")
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
-    response = kibox.chat(message)
     response = news.news_checker(message)
     return {"reply": response}
