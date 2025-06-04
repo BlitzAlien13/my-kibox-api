@@ -132,7 +132,7 @@ class FakeNews:
                 similar = answer["data"]
                 return similar
         else:
-            print(f"✗ (extract) Fehler: {similar_request.status_code}")
+            print(f"✗ (similar) Fehler: {similar_request.status_code}")
 
     def news_checker(self, message, temperature=0.7, max_tokens=500):
         self.clear_conversation()
@@ -152,23 +152,25 @@ class FakeNews:
         )
 
         if response.status_code == 200:
-            important_link_prompt = self.extract_important(important)
-            wiki = requests.post(
-                f"{self.api_url}/api/wikipedia-link/search",
-                headers=self.headers,
-                json={
-                    "query": important_link_prompt,
-                    "limit": 1
-                }
-            )
-            if wiki.status_code == 200:
-                answer = wiki.json()
-                AnswerUrl = answer[0]["url"]
-                self.conversation.append({"role": "assistant", "content": AnswerUrl })
-                # Antwort der KI zum Verlauf hinzufügen
-                return AnswerUrl
-            else:
-                print(f"✗ (wiki) Fehler: {response.status_code}")
+            important_prompt = self.extract_important(important)
+            important_link_prompt = self.similar(important_prompt)
+            for link_prompt in important_link_prompt:
+                wiki = requests.post(
+                    f"{self.api_url}/api/wikipedia-link/search",
+                    headers=self.headers,
+                    json={
+                        "query": link_prompt,
+                        "limit": 1
+                    }
+                )
+                if wiki.status_code == 200:
+                    answer = wiki.json()
+                    AnswerUrl = answer[0]["url"]
+                    self.conversation.append({"role": "assistant", "content": AnswerUrl })
+                    # Antwort der KI zum Verlauf hinzufügen
+                    return AnswerUrl
+                else:
+                    print(f"✗ (wiki) Fehler: {response.status_code}")
         else:
             print(f"✗ (response) Fehler: {response.status_code}")
 
