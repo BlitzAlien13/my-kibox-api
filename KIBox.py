@@ -112,9 +112,27 @@ class FakeNews:
                 answer = extract.json()
                 important = answer["research_terms"][0]
                 return important
-              
+        
+    def similar(self, text):
+        similar_request = requests.post(
+            f"{self.api_url}/api/vector/search/similar",
+            headers=self.headers,
+            json={
+                    "project": text,
+                    "collection_name": text,
+                    "vector": [0],
+                    "limit": 10,
+                    "filter": {"additionalProp1": {}},
+                    "score_threshold": 1
+            }
+        )
+        if similar_request.status_code == 200:
+                
+                answer = similar_request.json()
+                similar = answer["data"]
+                return similar
         else:
-            print(f"✗ (extract) Fehler: {extract.status_code}")
+            print(f"✗ (extract) Fehler: {similar_request.status_code}")
 
     def news_checker(self, message, temperature=0.7, max_tokens=500):
         self.clear_conversation()
