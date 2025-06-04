@@ -147,7 +147,7 @@ class FakeNews:
             else:
                 print(f"✗ (wiki) Fehler: {response.status_code}")
         else:
-            print(f"✗ Fehler: {response.status_code}")
+            print(f"✗ (response) Fehler: {response.status_code}")
 
 
 
