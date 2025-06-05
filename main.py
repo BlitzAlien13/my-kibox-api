@@ -7,7 +7,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # <- für Produktion bitte spezifizieren!
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,6 +55,5 @@ async def similar(request: Request):
     message = data.get("message")
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
-    raw = news.similar(message)
-    response = [b.strip() for b in raw.split(",")]
+    response = news.similar(message)
     return {"reply": response}
