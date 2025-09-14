@@ -32,7 +32,6 @@ class KIBox:
     def chat(self, message, temperature=0.7, max_tokens=500):
         """Führt ein Gespräch mit Verlauf"""
         # Benutzer-Nachricht hinzufügen
-        self.add_system_message("Formatiere deine Ausgabe gut leserlich mit Absätzen")
         self.conversation.append({"role": "user", "content": message})
 
         # An API senden
@@ -55,7 +54,7 @@ class KIBox:
 
             return assistant_message
         else:
-            print(f"✗ Fehler: {response.status_code}")
+            print(f"✗ Fehler (chat): {response.status_code}")
             return None
 
     def get_user_info(self):
