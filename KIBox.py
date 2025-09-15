@@ -134,6 +134,46 @@ class FakeNews:
         else:
             print(f"✗ (similar) Fehler: {similar_request.status_code}")
 
+    def ard_api(self, text):
+        ard = requests.get(
+            "https://www.tagesschau.de/api2u/search/",
+            headers=self.headers,
+            params={
+                "searchText": text,
+                "pageSize": 5,
+                "resultPage": 2
+            }
+
+        )
+
+        if ard.status_code == 200:
+            answer_ard = ard.json()
+            result = answer_ard["searchResults"][0]
+            link = result.get("shareURL") or result.get("details")
+            if link and link.startswith("/"):
+                link = "https://www.tagesschau.de" + link
+            return link
+        else:
+            print(f"✗ (ard) Fehler: {ard.status_code}")
+
+    def wiki_api(self, text):
+        wiki = requests.post(
+            f"{self.api_url}/api/wikipedia-link/search",
+            headers=self.headers,
+            json={
+                "query": text,
+                "limit": 1
+            }
+        )
+
+        if wiki.status_code == 200:
+            answer_wiki = wiki.json()
+            AnswerUrl_wiki = answer_wiki[0]["url"]
+            self.conversation.append({"role": "assistant", "content": AnswerUrl_wiki })
+            return AnswerUrl_wiki
+        else:
+            print(f"✗ (wiki) Fehler: {wiki.status_code}")
+
     def news_checker(self, message, temperature=0.7, max_tokens=500):
         self.clear_conversation()
         #Führt ein Gespräch mit Verlauf
@@ -153,22 +193,8 @@ class FakeNews:
 
         if response.status_code == 200:
             important_prompt = self.extract_important(important)
-            wiki = requests.post(
-                f"{self.api_url}/api/wikipedia-link/search",
-                headers=self.headers,
-                json={
-                    "query": important_prompt,
-                    "limit": 1
-                }
-            )
-            if wiki.status_code == 200:
-                answer = wiki.json()
-                AnswerUrl = answer[0]["url"]
-                self.conversation.append({"role": "assistant", "content": AnswerUrl })
-                # Antwort der KI zum Verlauf hinzufügen
-                return AnswerUrl
-            else:
-                print(f"✗ (wiki) Fehler: {response.status_code}")
+            self.ard_api(important_prompt)
+            self.wiki_api(important_prompt)
         else:
             print(f"✗ (response) Fehler: {response.status_code}")
 
