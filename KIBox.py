@@ -1,4 +1,5 @@
 import requests
+import time
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
@@ -134,32 +135,64 @@ class FakeNews:
         else:
             print(f"✗ (similar) Fehler: {similar_request.status_code}")
 
-    def ard_api(self, text):
-        ard = requests.get(
-            "https://www.tagesschau.de/api2u/search/",
-            headers=self.headers,
-            params={
-                "searchText": text,
-                "pageSize": 5,
-                "resultPage": 2
-            }
-
-        )
-
-        if ard.status_code == 200:
-            answer_ard = ard.json()
-            results = answer_ard.get("searchResults", [])
-            if not results:     # keine Treffer
-                return None     # gibt nichts zurück
-
-            result = results[0]
-            link = result.get("shareURL") or result.get("details")
-            if link and link.startswith("/"):
-                link = "https://www.tagesschau.de" + link
-            return link
-        else:
-            print(f"✗ (ard) Fehler: {ard.status_code}")
             return None
+        
+    def fetch_all_articles(search_text):
+        page = 1
+        articles = []
+
+        while True:
+            resp = requests.get(
+                "https://www.tagesschau.de/api2u/search/",
+                params={
+                    "searchText": search_text,
+                    "pageSize": 5,
+                    "resultPage": page
+                }
+            )
+            if resp.status_code != 200:
+                print(f"Fehler: {resp.status_code}")
+                return None
+
+            data = resp.json()
+            results = data.get("searchResults", [])
+            if not results:
+                return None  # keine weiteren Seiten
+
+            for r in results:
+                title = r.get("title") or r.get("headline")
+                link = r.get("shareURL") or r.get("details")
+                if link and link.startswith("/"):
+                    link = "https://www.tagesschau.de" + link
+                if title and link:
+                    articles.append((title, link))
+
+            page += 1
+            return articles
+
+
+    def run_monitor(self, search_text):
+        seen_links = set()  # zum Duplikate vermeiden
+
+        while True:
+            print(f"\nSuche nach '{search_text}' ...")
+            articles = self.fetch_all_articles(search_text)
+
+            new_articles = []
+            for title, link in articles:
+                if link not in seen_links:
+                    new_articles.append((title, link))
+                    seen_links.add(link)
+
+            if new_articles:
+                print(f"Neue Artikel gefunden: {len(new_articles)}")
+                for title, link in new_articles:
+                    print(f"- {title}\n  {link}\n")
+            else:
+                print("Keine neuen Artikel gefunden.")
+
+
+            time.sleep(300)
 
     def wiki_api(self, text):
         wiki = requests.post(
@@ -196,9 +229,8 @@ class FakeNews:
 
         if response.status_code == 200:
             important_prompt = self.extract_important(important)
-            ard = self.ard_api(important_prompt)
             wiki = self.wiki_api(important_prompt)
-            return ard, wiki
+            return wiki
         else:
             print(f"✗ (response) Fehler: {response.status_code}")
 
