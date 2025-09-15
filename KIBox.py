@@ -148,13 +148,18 @@ class FakeNews:
 
         if ard.status_code == 200:
             answer_ard = ard.json()
-            result = answer_ard["searchResults"][0]
+            results = answer_ard.get("searchResults", [])
+            if not results:     # keine Treffer
+                return None     # gibt nichts zurück
+
+            result = results[0]
             link = result.get("shareURL") or result.get("details")
             if link and link.startswith("/"):
                 link = "https://www.tagesschau.de" + link
             return link
         else:
             print(f"✗ (ard) Fehler: {ard.status_code}")
+            return None
 
     def wiki_api(self, text):
         wiki = requests.post(
