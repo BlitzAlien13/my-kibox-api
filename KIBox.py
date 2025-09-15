@@ -176,8 +176,6 @@ class FakeNews:
 
     def news_checker(self, message, temperature=0.7, max_tokens=500):
         self.clear_conversation()
-        #Führt ein Gespräch mit Verlauf
-        # Benutzer-Nachricht hinzufügen
         self.conversation.append({"role": "user", "content": message})
         important= self.conversation[0]["content"]
 
@@ -193,8 +191,9 @@ class FakeNews:
 
         if response.status_code == 200:
             important_prompt = self.extract_important(important)
-            self.ard_api(important_prompt)
-            self.wiki_api(important_prompt)
+            ard = self.ard_api(important_prompt)
+            wiki = self.wiki_api(important_prompt)
+            return ard, wiki
         else:
             print(f"✗ (response) Fehler: {response.status_code}")
 
