@@ -1,5 +1,6 @@
 import requests
 import time
+import uuid
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
@@ -137,62 +138,78 @@ class FakeNews:
 
             return None
         
-    def fetch_all_articles(search_text):
-        page = 1
-        articles = []
+    def ard_api(self):
+        resp = requests.get(
+            "https://www.tagesschau.de/api2u/homepage/",
+            headers=self.headers,
+        )
 
-        while True:
-            resp = requests.get(
-                "https://www.tagesschau.de/api2u/search/",
-                params={
-                    "searchText": search_text,
-                    "pageSize": 5,
-                    "resultPage": page
-                }
-            )
-            if resp.status_code != 200:
-                print(f"Fehler: {resp.status_code}")
+        if resp.status_code != 200:
+                print(f"Fehler (ard_api): {resp.status_code}")
                 return None
 
-            data = resp.json()
-            results = data.get("searchResults", [])
-            if not results:
-                return None  # keine weiteren Seiten
+        data = resp.json()
+        results = data.get("news", [])
+        if not results:
+            return None  # keine weiteren Seiten
 
-            for r in results:
-                title = r.get("title") or r.get("headline")
-                link = r.get("shareURL") or r.get("details")
-                if link and link.startswith("/"):
-                    link = "https://www.tagesschau.de" + link
-                if title and link:
-                    articles.append((title, link))
+        for r in results:
+            title = r.get("title") or r.get("headline")
+            link = r.get("shareURL") or r.get("details")
+            if link and link.startswith("/"):
+                link = "https://www.tagesschau.de" + link
+            if link and title:
+                vektor = self.calc_vektor(title)
+            
+            if title and link and vektor:
+                vektor_id = str(uuid.uuid4())
+                atd=requests.post(
+                    f"{self.api_url}/api/vector/points/upsert",
+                    headers=self.headers,
+                    json={
+                            "project": "db_ard",
+                            "collection_name": "tagesschau",
+                            "points": [
+                                {
+                                "id": vektor_id,
+                                "vector": vektor[:50],
+                                "payload": {
+                                    "title": title,
+                                    "link": link
+                                }
+                                }
+                            ]
+                            }
+                )
+                if atd.status_code == 200:
+                    print(f"✓ (atd) Erfolg: {atd.status_code, atd.text}")
+                else:
+                    print(f"✗ (atd) Fehler: {atd.status_code, atd.text}")
+                    #articles.append((title, link, vektor))
 
-            page += 1
-            return articles
-
-
-    def run_monitor(self, search_text):
-        seen_links = set()  # zum Duplikate vermeiden
-
-        while True:
-            print(f"\nSuche nach '{search_text}' ...")
-            articles = self.fetch_all_articles(search_text)
-
-            new_articles = []
-            for title, link in articles:
-                if link not in seen_links:
-                    new_articles.append((title, link))
-                    seen_links.add(link)
-
-            if new_articles:
-                print(f"Neue Artikel gefunden: {len(new_articles)}")
-                for title, link in new_articles:
-                    print(f"- {title}\n  {link}\n")
+    
+    def run_monitor(self, message):
+            text = self.extract_important(message)
+            vektor = self.calc_vektor(text)
+            similar_request = requests.post(
+            f"{self.api_url}/api/vector/search/similar",
+            headers=self.headers,
+            json={
+                    "project": "db_ard",
+                    "collection_name": "tagesschau",
+                    "vector": vektor[:50],
+                    "limit": 1,
+                    "filter": {},
+                    "score_threshold": 0.2
+            }
+        )
+            if similar_request.status_code == 200:
+                    answer = similar_request.json()
+                    link = answer["data"][0]["payload"]["link"]
+                    self.conversation.append({"role": "assistant", "content": link })
+                    
             else:
-                print("Keine neuen Artikel gefunden.")
-
-
-            time.sleep(300)
+                print(f"✗ (monitor) Fehler: {similar_request.status_code}")
 
     def wiki_api(self, text):
         wiki = requests.post(
