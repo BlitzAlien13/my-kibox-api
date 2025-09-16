@@ -5,13 +5,15 @@ from KIBox import KIBox
 from KIBox import FakeNews
 
 app = FastAPI()
-
+origins = [
+    "https://faktenchcker.netlify.app/",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins, 
+    allow_credentials=True,
+    allow_methods=["POST", "GET"],
+    allow_headers=["Content-Type"],
 )
 
 kibox = KIBox(kibox_instance=None)
