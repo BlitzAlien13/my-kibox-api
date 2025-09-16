@@ -224,7 +224,6 @@ class FakeNews:
                     answer = similar_request.json()
                     link = answer["data"][0]["payload"]["link"]
                     self.conversation.append({"role": "assistant", "content": link })
-                    print(link)
                     
             else:
                 print(f"✗ (monitor) Fehler: {similar_request.status_code}")
