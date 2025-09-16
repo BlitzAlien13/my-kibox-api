@@ -114,7 +114,23 @@ class FakeNews:
                 answer = extract.json()
                 important = answer["research_terms"][0]
                 return important
+    def calc_vektor(self, text):
+        response = requests.post(
+            f"{self.api_url}/api/embedding/embeddings",
+            headers=self.headers,
+            json={
+                "input": [text]  # Liste von Texten        
+                }
+        )
+        if response.status_code == 200:
+            result = response.json()
+            return result["data"][0]["embedding"]  # Erste (und einzige) Embedding 
         
+        if response.status_code != 200:
+            print(f"Fehler: {response.status_code}")
+            print(response.text)
+            return None
+            
     def similar(self, text):
         similar_request = requests.post(
             f"{self.api_url}/api/vector/search/similar",
