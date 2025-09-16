@@ -114,6 +114,7 @@ class FakeNews:
                 answer = extract.json()
                 important = answer["research_terms"][0]
                 return important
+        
     def calc_vektor(self, text):
         response = requests.post(
             f"{self.api_url}/api/embedding/embeddings",
