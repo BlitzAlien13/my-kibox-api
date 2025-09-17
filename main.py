@@ -7,6 +7,7 @@ from KIBox import FakeNews
 app = FastAPI()
 origins = [
     "https://faktenchcker.netlify.app",
+    "https://faktenchcker.netlify.app/"
 ]
 app.add_middleware(
     CORSMiddleware,
