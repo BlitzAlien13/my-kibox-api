@@ -68,6 +68,7 @@ async def ard(request: Request):
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.run_monitor(message)
+    print(response)
     return {"reply": response}
 
 @app.post("/similar")
