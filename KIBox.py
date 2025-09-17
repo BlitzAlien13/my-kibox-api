@@ -21,7 +21,7 @@ class KIBox:
             data = response.json()
             self.token = data["token"]
             self.headers["Authorization"] = f"Bearer {self.token}"
-            print(f"✓ Angemeldet als: {data['username']} ({data['role']})")
+            print(f"✓ KIB_Angemeldet als: {data['username']} ({data['role']})")
             return True
         else:
             print(f"✗ Login fehlgeschlagen: {response.json()}")
@@ -87,7 +87,7 @@ class FakeNews:
             data = response.json()
             self.token = data["token"]
             self.headers["Authorization"] = f"Bearer {self.token}"
-            print(f"✓ Angemeldet als: {data['username']} ({data['role']})")
+            print(f"✓ News_Angemeldet als: {data['username']} ({data['role']})")
             return True
         else:
             print(f"✗ Login fehlgeschlagen: {response.json()}")

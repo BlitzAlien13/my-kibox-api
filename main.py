@@ -1,44 +1,64 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
-from KIBox import KIBox
-from KIBox import FakeNews
+from KIBox import KIBox, FakeNews
+from db_service import DatabaseService
 
-app = FastAPI()
+# --- FastAPI Setup ---
+async def wiederkehrende_aufgabe():
+    try:
+        while True:
+            print("Event alle 5 Minuten ausgelöst!")
+            news.ard_api()
+            await asyncio.sleep(300)
+    except asyncio.CancelledError:
+        print("Wiederkehrende Aufgabe beendet")
+
+async def lifespan(app: FastAPI):
+    # Startup
+    kibox.login("lorenc", "blitz-alien")
+    news.login("lorenc", "blitz-alien")
+    
+    # Hintergrundtask starten
+    task = asyncio.create_task(wiederkehrende_aufgabe())
+    
+    yield  # <- hier läuft der Server
+    
+    # Shutdown
+    task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+    print("App heruntergefahren")
+
+app = FastAPI(lifespan=lifespan)
+
+# --- CORS Setup ---
 origins = [
     "https://faktenchcker.netlify.app",
     "https://faktenchcker.netlify.app/",
-    "http://localhost:3000",         
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins, 
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# --- Services ---
 kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
+data = DatabaseService(kibox_instance=None)
 
+# --- Routes ---
 @app.get("/")
 async def root():
     return {"status": "ok"}
 
-@app.on_event("startup")
-async def startup_event():
-    kibox.login("lorenc", "blitz-alien")
-    news.login("lorenc", "blitz-alien")
-    asyncio.create_task(wiederkehrende_aufgabe())
-
-async def wiederkehrende_aufgabe():
-    while True:
-        print("Event alle 5 Minuten ausgelöst!")
-        news.ard_api()
-        await asyncio.sleep(300)
-
-    
 @app.post("/login")
 async def login(request: Request):
     data = await request.json()
