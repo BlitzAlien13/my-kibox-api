@@ -3,6 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from KIBox import KIBox, FakeNews
 from db_service import DatabaseService
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  
+
+username = os.getenv("KIBOX_USER")
+password = os.getenv("KIBOX_PASS")
+
+# --- Services ---
+kibox = KIBox(kibox_instance=None)
+news = FakeNews(kibox_instance=None)
+data = DatabaseService(kibox_instance=None)
 
 # --- FastAPI Setup ---
 async def wiederkehrende_aufgabe():
@@ -16,11 +28,12 @@ async def wiederkehrende_aufgabe():
 
 async def lifespan(app: FastAPI):
     # Startup
-    kibox.login("lorenc", "blitz-alien")
-    news.login("lorenc", "blitz-alien")
-    
+    kibox.login(username, password)
+    news.login(username, password)
+    data.login(username, password)
     # Hintergrundtask starten
     task = asyncio.create_task(wiederkehrende_aufgabe())
+    data.project_check()
     
     yield  # <- hier läuft der Server
     
@@ -43,16 +56,11 @@ origins = [
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins= ["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# --- Services ---
-kibox = KIBox(kibox_instance=None)
-news = FakeNews(kibox_instance=None)
-data = DatabaseService(kibox_instance=None)
 
 # --- Routes ---
 @app.get("/")
