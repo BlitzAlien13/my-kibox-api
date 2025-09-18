@@ -129,30 +129,25 @@ class DatabaseService:
                 print(f"{name} hinzugefügt")
 
     def get_user_by_username(self, username: str):
-        user=requests.post(
+        response = requests.post(
             f"{self.api_url}/api/db/execute",
-                headers=self.headers,
-                json={
-                    "project": "db_user",
-                    "sql": f"""
-                        SELECT CASE WHEN EXISTS (
-                        SELECT 1
-                        FROM TUser
-                        WHERE name = '{username}'
-                    ) THEN 1 ELSE 0 END AS UserExists;
-                    """
-                }
+            headers=self.headers,
+            json={
+                "project": "db_user",
+                "sql": f"SELECT * FROM TUser WHERE name = '{username}';"
+            }
         )
-        if user.status_code == 200:
-            answer = user.json()
-            data = answer["data"][0]["UserExists"]
-            user_exists = bool(data)
+        
+        if response.status_code != 200:
+            print(f"✗ Fehler: {response.status_code} - {response.text}")
+            return None
 
-            if user_exists:
-                print("User schon verhanden")
-            else:
-                print("User nicht Verhanden")
-        else:
-            print(f"✗ (get_user) Fehler: {user.status_code} - {user.text}")
+        answer = response.json()
+        if not answer["data"]:
+            return None  # Benutzer nicht gefunden
+
+        user_data = answer["data"][0]  # Erste Zeile zurückgeben
+        return user_data
+
             
 
