@@ -114,7 +114,7 @@ class DatabaseService:
         else:
             print(f"✗ (project_list) Fehler: {response_get.status_code}")
 
-    def add_user(self, name: str, klasse: str, geburtstag, email: str, password_hash: str):
+    def add_user(self, name: str, klasse: str, geburtstag: str, email: str, password_hash: str):
             AUser=requests.post(
                 f"{self.api_url}/api/db/execute",
                 headers=self.headers,
@@ -127,7 +127,7 @@ class DatabaseService:
             if AUser.status_code == 200:
                 print({name}, "zur Data hinzugefügt")
             else:
-                print(f"✗ (add_user) Fehler: {AUser.status_code}")
+                print(f"✗ (add_user) Fehler: {AUser.status_code, AUser.text}")
 
     def get_user_by_username(self, username: str):
         user=requests.post(
