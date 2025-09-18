@@ -36,4 +36,4 @@ class AuthService:
         user = self.db.get_user_by_username(username)
         if not user or not self.verify_password(password, user["password_hash"]):
             raise ValueError("Invalid credentials")
-        return self.create_access_token({"sub": user["username"]})
+        return self.create_access_token({"sub": user["name"]})
