@@ -17,7 +17,7 @@ password = os.getenv("KIBOX_PASS")
 class RegisterRequest(BaseModel):
     name: str
     klasse: str
-    geburtstag: str  # falls du später echtes Datum willst -> datetime.date
+    geburtstag: str
     email: str
     password: str
 
