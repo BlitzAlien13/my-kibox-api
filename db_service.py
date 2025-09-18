@@ -156,3 +156,4 @@ class DatabaseService:
         else:
             print(f"✗ (get_user) Fehler: {user.status_code} - {user.text}")
             
+
