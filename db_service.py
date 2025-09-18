@@ -66,7 +66,7 @@ class DatabaseService:
 
                     if table_exists:
                         print("Table already exists")
-                        
+
                     else:
                         create_table_response = requests.post(
                             f"{self.api_url}/api/db/execute",
@@ -80,7 +80,8 @@ class DatabaseService:
                                     klasse VARCHAR(10),
                                     geburtstag DATE,
                                     email VARCHAR(100),
-                                    eintrittsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                    eintrittsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    password_hash VARCHAR(255)
                                 )
                                 """ 
                             }
@@ -112,13 +113,46 @@ class DatabaseService:
                     print(f"✗ (db_add) Fehler: {response_add.status_code} - {response_add.text}")
         else:
             print(f"✗ (project_list) Fehler: {response_get.status_code}")
-    #def init_db(self):
 
-    #def add_user(self, username: str, email: str, password_hash: str):
-Data = DatabaseService(kibox_instance=None)
-if Data.login("lorenc", "blitz-alien"):
-    Data.project_check()
+    def add_user(self, name: str, klasse: str, geburtstag, email: str, password_hash: str):
+            AUser=requests.post(
+                f"{self.api_url}/api/db/execute",
+                headers=self.headers,
+                json={
+                    "project": "db_user",
+                    "sql": "INSERT INTO schueler (name, klasse, geburtstag, email, password_hash) VALUES (%s, %s, %s, %s, %s)",
+                    "params": [name, klasse, geburtstag, email, password_hash]
+                }
+            )
+            if AUser.status_code == 200:
+                print({name}, "zur Data hinzugefügt")
+            else:
+                print(f"✗ (add_user) Fehler: {AUser.status_code}")
 
-    #def get_user_by_username(self, username: str):
+    def get_user_by_username(self, username: str):
+        user=requests.post(
+            f"{self.api_url}/api/db/execute",
+                headers=self.headers,
+                json={
+                    "project": "db_user",
+                    "sql": f"""
+                        SELECT CASE WHEN EXISTS (
+                        SELECT 1
+                        FROM TUser
+                        WHERE name = '{username}'
+                    ) THEN 1 ELSE 0 END AS UserExists;
+                    """
+                }
+        )
+        if user.status_code == 200:
+            answer = user.json()
+            data = answer["data"][0]["UserExists"]
+            user_exists = bool(data)
 
-    
+            if user_exists:
+                print("User schon verhanden")
+            else:
+                print("USer nicht Verhanden")
+        else:
+            print(f"✗ (get_user) Fehler: {user.status_code} - {user.text}")
+            

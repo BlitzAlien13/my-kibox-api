@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from KIBox import KIBox, FakeNews
 from db_service import DatabaseService
+from auth_service import AuthService
 from dotenv import load_dotenv
 import os
+
 
 load_dotenv()  
 
@@ -14,7 +16,8 @@ password = os.getenv("KIBOX_PASS")
 # --- Services ---
 kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
-data = DatabaseService(kibox_instance=None)
+db = DatabaseService(kibox_instance=None)
+auth = AuthService(db)
 
 # --- FastAPI Setup ---
 async def wiederkehrende_aufgabe():
@@ -30,10 +33,10 @@ async def lifespan(app: FastAPI):
     # Startup
     kibox.login(username, password)
     news.login(username, password)
-    data.login(username, password)
+    db.login(username, password)
     # Hintergrundtask starten
     task = asyncio.create_task(wiederkehrende_aufgabe())
-    data.project_check()
+    db.project_check()
     
     yield  # <- hier läuft der Server
     
@@ -67,13 +70,22 @@ app.add_middleware(
 async def root():
     return {"status": "ok"}
 
+@app.post("/register")
+def register(name: str, klasse: str, geburtstag, email: str, password: str):
+    try:
+        auth.register_user(name, klasse, geburtstag, email, password)
+        return {"msg": "User registered successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 @app.post("/login")
-async def login(request: Request):
-    data = await request.json()
-    username = "lorenc"
-    password = "blitz-alien"
-    return kibox.login(username, password)
-
+def login(username: str, password: str):
+    try:
+        token = auth.login_user(username, password)
+        return {"access_token": token, "token_type": "bearer"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
 @app.post("/chat")
 async def chat(request: Request):
     data = await request.json()
