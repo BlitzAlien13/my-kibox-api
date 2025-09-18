@@ -11,7 +11,6 @@ class KIBox:
         self.conversation = []
 
     def login(self, username, password):
-        """Anmeldung bei der KI.Box"""
         response = requests.post(
             f"{self.api_url}/api/auth/token",
             json={"username": username, "password": password}
@@ -28,15 +27,11 @@ class KIBox:
             return False
         
     def add_system_message(self, content):
-        """Fügt eine System-Nachricht hinzu (z.B. Anweisungen)"""
         self.conversation.append({"role": "system", "content": content})
 
     def chat(self, message, temperature=0.7, max_tokens=500):
-        """Führt ein Gespräch mit Verlauf"""
-        # Benutzer-Nachricht hinzufügen
         self.conversation.append({"role": "user", "content": message})
 
-        # An API senden
         response = requests.post(
             f"{self.api_url}/api/llm/chat/completions",
             headers=self.headers,
@@ -51,7 +46,6 @@ class KIBox:
             result = response.json()
             assistant_message = result["choices"][0]["message"]["content"]
 
-            # Antwort der KI zum Verlauf hinzufügen
             self.conversation.append({"role": "assistant", "content": assistant_message})
 
             return assistant_message
@@ -60,12 +54,10 @@ class KIBox:
             return None
 
     def get_user_info(self):
-        """Informationen über den aktuellen Benutzer"""
         response = requests.get(f"{self.api_url}/api/user/info", headers=self.headers)
         return response.json() if response.status_code == 200 else None
 
     def clear_conversation(self):
-        """Löscht den Gesprächsverlauf"""
         self.conversation = []
     
 class FakeNews:
@@ -77,7 +69,6 @@ class FakeNews:
         self.conversation = []
 
     def login(self, username, password):
-        """Anmeldung bei der KI.Box"""
         response = requests.post(
             f"{self.api_url}/api/auth/token",
             json={"username": username, "password": password}
@@ -94,11 +85,9 @@ class FakeNews:
             return False
 
     def add_system_message(self, content):
-        """Fügt eine System-Nachricht hinzu (z.B. Anweisungen)"""
         self.conversation.append({"role": "system", "content": content})
 
     def clear_conversation(self):
-        """Löscht den Gesprächsverlauf"""
         self.conversation = []
 
     def extract_important(self, text):

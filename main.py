@@ -25,14 +25,11 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-# --- Services ---
 kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
 db = DatabaseService(kibox_instance=None)
 auth = AuthService(db)
 
-
-# --- FastAPI Setup ---
 async def wiederkehrende_aufgabe():
     try:
         while True:
@@ -51,9 +48,8 @@ async def lifespan(app: FastAPI):
     task = asyncio.create_task(wiederkehrende_aufgabe())
     db.project_check()
     
-    yield  # <- hier läuft der Server
+    yield 
     
-    # Shutdown
     task.cancel()
     try:
         await task
@@ -63,7 +59,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# --- CORS Setup ---
 origins = [
     "https://faktenchcker.netlify.app",
     "https://faktenchcker.netlify.app/",
@@ -78,7 +73,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Routes ---
 @app.get("/")
 async def root():
     return {"status": "ok"}

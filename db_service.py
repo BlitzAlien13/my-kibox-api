@@ -8,7 +8,6 @@ class DatabaseService:
         self.kibox = kibox_instance
 
     def login(self, username, password):
-        """Anmeldung bei der KI.Box"""
         response = requests.post(
             f"{self.api_url}/api/auth/token",
             json={"username": username, "password": password}
@@ -144,9 +143,9 @@ class DatabaseService:
 
         answer = response.json()
         if not answer["data"]:
-            return None  # Benutzer nicht gefunden
+            return None  
 
-        user_data = answer["data"][0]  # Erste Zeile zurückgeben
+        user_data = answer["data"][0]  
         return user_data
 
             
