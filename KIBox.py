@@ -56,7 +56,7 @@ class KIBox:
 
             return assistant_message
         else:
-            print(f"✗ Fehler (chat): {response.status_code}")
+            print(f"✗ (chat) Fehler: {response.status_code, response.text}")
             return None
 
     def get_user_info(self):
@@ -115,7 +115,7 @@ class FakeNews:
                 important = answer["research_terms"][0]
                 return important
         
-    def calc_vektor(self, text):
+    def calc_vector(self, text):
         response = requests.post(
             f"{self.api_url}/api/embedding/embeddings",
             headers=self.headers,
@@ -128,7 +128,7 @@ class FakeNews:
             return result["data"][0]["embedding"]  # Erste (und einzige) Embedding 
         
         if response.status_code != 200:
-            print(f"Fehler: {response.status_code}")
+            print(f"✗ calc_vector: {response.status_code, response.text}")
             print(response.text)
             return None
             
@@ -151,63 +151,100 @@ class FakeNews:
                 similar = answer["data"]
                 return similar
         else:
-            print(f"✗ (similar) Fehler: {similar_request.status_code}")
+            print(f"✗ (similar) Fehler: {similar_request.status_code, similar_request.text}")
 
             return None
         
     def ard_api(self):
-        resp = requests.get(
-            "https://www.tagesschau.de/api2u/homepage/",
+        dfd=requests.delete(
+            f"{self.api_url}/api/vector/collection/db_ard/tagesschau",
             headers=self.headers,
+            params={
+                "project": "db_ard",
+                "collection_name": "tagesschau"
+            }
         )
-
-        if resp.status_code != 200:
-                print(f"Fehler (ard_api): {resp.status_code}")
-                return None
-
-        data = resp.json()
-        results = data.get("news", [])
-        if not results:
-            return None  # keine weiteren Seiten
-
-        for r in results:
-            title = r.get("title") or r.get("headline")
-            link = r.get("shareURL") or r.get("details")
-            if link and link.startswith("/"):
-                link = "https://www.tagesschau.de" + link
-            if link and title:
-                vektor = self.calc_vektor(title)
-            
-            if title and link and vektor:
-                vektor_id = str(uuid.uuid4())
-                atd=requests.post(
-                    f"{self.api_url}/api/vector/points/upsert",
-                    headers=self.headers,
-                    json={
-                            "project": "db_ard",
-                            "collection_name": "tagesschau",
-                            "points": [
-                                {
-                                "id": vektor_id,
-                                "vector": vektor[:50],
-                                "payload": {
-                                    "title": title,
-                                    "link": link
-                                }
-                                }
-                            ]
-                            }
+        if dfd.status_code == 200:
+            deletus = dfd.json()
+            print(deletus)
+            create_tagesschau=requests.post(
+                f"{self.api_url}/api/vector/collection",
+                headers=self.headers,
+                json={
+                    "project": "db_ard",
+                    "collection_name": "tagesschau",
+                    "vector_size": 50,  # Für Demo-Zwecke kleine Dimension
+                    "distance": "COSINE",  # Gut für Text-Ähnlichkeiten
+                    "description": "Tagesschau Honepage Vektoren",
+                    "shared_with_role": "STUDENT"
+                }
                 )
-                if atd.status_code == 200:
-                    print(f"✓ (atd) Erfolg: {atd.status_code, atd.text}")
+            if create_tagesschau.status_code == 200:
+                answer = create_tagesschau.json()
+                print(answer)
+                vektor_id = str(uuid.uuid4())
+
+                resp = requests.get(
+                    "https://www.tagesschau.de/api2u/homepage/",
+                    headers=self.headers,
+                )
+
+                if resp.status_code != 200:
+                        print(f"Fehler (ard_api): {resp.status_code, resp.text}")
+                        return None
                 else:
-                    print(f"✗ (atd) Fehler: {atd.status_code, atd.text}")
-                    #articles.append((title, link, vektor))
+                    data = resp.json()
+                    results = data.get("news", [])
+                    if not results:
+                        return None  # keine weiteren Seiten
+                    if results:
+                        for r in results:
+                            title = r.get("title") or r.get("headline")
+                            link = r.get("shareURL") or r.get("details")
+                            if link and link.startswith("/"):
+                                link = "https://www.tagesschau.de" + link
+                            if link and title:
+                                vektor = self.calc_vector(title)
+                            
+                            if title and link and vektor:
+                                vektor_id = str(uuid.uuid4())
+                                atd=requests.post(
+                                    f"{self.api_url}/api/vector/points/upsert",
+                                    headers=self.headers,
+                                    json={
+                                            "project": "db_ard",
+                                            "collection_name": "tagesschau",
+                                            "points": [
+                                                {
+                                                "id": vektor_id,
+                                                "vector": vektor[:50],
+                                                "payload": {
+                                                    "title": title,
+                                                    "link": link
+                                                }
+                                                }
+                                            ]
+                                            }
+                                )
+                                if atd.status_code == 200:
+                                    print(f"✓ (atd) Erfolg: {atd.status_code, atd.text}")
+                                else:
+                                    print(f"✗ (atd) Fehler: {atd.status_code, atd.text}")
+            else:
+                print(f"✗ (collection tagesschau) Fehler: {create_tagesschau.status_code, create_tagesschau.text}")
+        else:
+            print(f"✗ (deletus) Fehler: {atd.status_code, atd.text}")
+          
+
+
+
+
+                
 
     
     def run_monitor(self, message):
             text = self.extract_important(message)
-            vektor = self.calc_vektor(text)
+            vektor = self.calc_vector(text)
             similar_request = requests.post(
             f"{self.api_url}/api/vector/search/similar",
             headers=self.headers,
@@ -227,7 +264,7 @@ class FakeNews:
                     return link
                     
             else:
-                print(f"✗ (monitor) Fehler: {similar_request.status_code}")
+                print(f"✗ (monitor) Fehler: {similar_request.status_code, similar_request.text}")
 
     def wiki_api(self, text):
         wiki = requests.post(
@@ -245,7 +282,7 @@ class FakeNews:
             self.conversation.append({"role": "assistant", "content": AnswerUrl_wiki })
             return AnswerUrl_wiki
         else:
-            print(f"✗ (wiki) Fehler: {wiki.status_code}")
+            print(f"✗ (wiki) Fehler: {wiki.status_code, wiki.text}")
 
     def news_checker(self, message, temperature=0.7, max_tokens=500):
         self.clear_conversation()
@@ -267,7 +304,7 @@ class FakeNews:
             wiki = self.wiki_api(important_prompt)
             return wiki
         else:
-            print(f"✗ (response) Fehler: {response.status_code}")
+            print(f"✗ (response) Fehler: {response.status_code, response.text}")
 
 
 
