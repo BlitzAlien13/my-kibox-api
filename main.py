@@ -95,6 +95,7 @@ def register(user: RegisterRequest):
     
 @app.post("/login")
 def login(data: LoginRequest):
+    print(data)
     try:
         token = auth.login_user(data.username, data.password)
         return {"access_token": token, "token_type": "bearer"}

@@ -125,8 +125,8 @@ class DatabaseService:
                 }
             )
             if AUser.status_code == 200:
-                print({name}, "zur Data hinzugefügt")
-            else:
+                data = AUser.json()
+                print(data)
                 print(f"✗ (add_user) Fehler: {AUser.status_code, AUser.text}")
 
     def get_user_by_username(self, username: str):
