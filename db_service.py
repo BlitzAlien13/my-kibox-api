@@ -120,7 +120,7 @@ class DatabaseService:
                 headers=self.headers,
                 json={
                     "project": "db_user",
-                    "sql": "INSERT INTO TUSer (name, klasse, geburtstag, email, password_hash) VALUES (%s, %s, %s, %s, %s)",
+                    "sql": "INSERT INTO TUser (name, klasse, geburtstag, email, password_hash) VALUES (%s, %s, %s, %s, %s)",
                     "params": [name, klasse, geburtstag, email, password_hash]
                 }
             )
