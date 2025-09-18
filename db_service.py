@@ -126,8 +126,7 @@ class DatabaseService:
             )
             if AUser.status_code == 200:
                 data = AUser.json()
-                print(data)
-                print(f"✗ (add_user) Fehler: {AUser.status_code, AUser.text}")
+                print(f"{name} hinzugefügt")
 
     def get_user_by_username(self, username: str):
         user=requests.post(
@@ -152,7 +151,7 @@ class DatabaseService:
             if user_exists:
                 print("User schon verhanden")
             else:
-                print("USer nicht Verhanden")
+                print("User nicht Verhanden")
         else:
             print(f"✗ (get_user) Fehler: {user.status_code} - {user.text}")
             

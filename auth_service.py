@@ -29,6 +29,7 @@ class AuthService:
         if self.db.get_user_by_username(name):
             raise ValueError("Username already exists")
         password_hash = self.hash_password(password)
+        print(password_hash)
         self.db.add_user(name, klasse, geburtstag, email, password_hash)
 
     def login_user(self, username: str, password: str) -> str:
