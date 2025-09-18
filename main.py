@@ -5,6 +5,7 @@ from KIBox import KIBox, FakeNews
 from db_service import DatabaseService
 from auth_service import AuthService
 from dotenv import load_dotenv
+from pydantic import BaseModel
 import os
 
 
@@ -13,11 +14,23 @@ load_dotenv()
 username = os.getenv("KIBOX_USER")
 password = os.getenv("KIBOX_PASS")
 
+class RegisterRequest(BaseModel):
+    name: str
+    klasse: str
+    geburtstag: str  # falls du später echtes Datum willst -> datetime.date
+    email: str
+    password: str
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 # --- Services ---
 kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
 db = DatabaseService(kibox_instance=None)
 auth = AuthService(db)
+
 
 # --- FastAPI Setup ---
 async def wiederkehrende_aufgabe():
@@ -71,17 +84,19 @@ async def root():
     return {"status": "ok"}
 
 @app.post("/register")
-def register(name: str, klasse: str, geburtstag, email: str, password: str):
+def register(user: RegisterRequest):
     try:
-        auth.register_user(name, klasse, geburtstag, email, password)
+        auth.register_user(
+            user.name, user.klasse, user.geburtstag, user.email, user.password
+        )
         return {"msg": "User registered successfully"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/login")
-def login(username: str, password: str):
+def login(data: LoginRequest):
     try:
-        token = auth.login_user(username, password)
+        token = auth.login_user(data.username, data.password)
         return {"access_token": token, "token_type": "bearer"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
