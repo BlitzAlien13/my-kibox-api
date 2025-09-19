@@ -164,7 +164,7 @@ class FakeNews:
                     "collection_name": "tagesschau",
                     "vector_size": 8192,
                     "distance": "COSINE",  
-                    "description": "Tagesschau Honepage Vektoren",
+                    "description": "Tagesschau Homepage Vektoren",
                     "shared_with_role": "STUDENT"
                 }
                 )
