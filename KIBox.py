@@ -162,7 +162,7 @@ class FakeNews:
                 json={
                     "project": "db_ard",
                     "collection_name": "tagesschau",
-                    "vector_size": 8192,
+                    "vector_size": 768,
                     "distance": "COSINE",  
                     "description": "Tagesschau Homepage Vektoren",
                     "shared_with_role": "STUDENT"
@@ -206,7 +206,7 @@ class FakeNews:
                                             "points": [
                                                 {
                                                 "id": vektor_id,
-                                                "vector": vektor[:8192],
+                                                "vector": vektor[:768],
                                                 "payload": {
                                                     "title": title,
                                                     "link": link
@@ -240,7 +240,7 @@ class FakeNews:
             json={
                     "project": "db_ard",
                     "collection_name": "tagesschau",
-                    "vector": vektor[:8192],
+                    "vector": vektor[:768],
                     "limit": 1,
                     "filter": {},
                     "score_threshold": 0.2
