@@ -34,8 +34,8 @@ async def wiederkehrende_aufgabe():
     try:
         while True:
             print("Event alle 5 Minuten ausgelöst!")
-            news.ard_api()
             news.ard_deletus()
+            news.ard_api()
             await asyncio.sleep(300)
     except asyncio.CancelledError:
         print("Wiederkehrende Aufgabe beendet")
