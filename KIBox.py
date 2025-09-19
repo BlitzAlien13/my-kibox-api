@@ -162,7 +162,7 @@ class FakeNews:
                 json={
                     "project": "db_ard",
                     "collection_name": "tagesschau",
-                    "vector_size": [8192],
+                    "vector_size": 8192,
                     "distance": "COSINE",  
                     "description": "Tagesschau Honepage Vektoren",
                     "shared_with_role": "STUDENT"
