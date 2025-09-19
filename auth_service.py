@@ -14,10 +14,10 @@ class AuthService:
         self.db = db
 
     def hash_password(self, password: str) -> str:
-        return pwd_context.hash(password)
+        return pwd_context.hash(password)    # returnt aus dem Passwort ein hash
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
+        return pwd_context.verify(plain_password, hashed_password)    #überprüft das eingegebene Passwort mit dem hash in der Datnebank
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()

@@ -121,14 +121,14 @@ class FakeNews:
             print(response.text)
             return None
             
-    def similar(self, text):
+    def similar(self, text, vektor):
         similar_request = requests.post(
             f"{self.api_url}/api/vector/search/similar",
             headers=self.headers,
             json={
                     "project": text,
                     "collection_name": text,
-                    "vector": [0],
+                    "vector": vektor,
                     "limit": 10,
                     "filter": {"additionalProp1": {}},
                     "score_threshold": 1
@@ -206,7 +206,7 @@ class FakeNews:
                                             "points": [
                                                 {
                                                 "id": vektor_id,
-                                                "vector": vektor[:8192],
+                                                "vector": vektor,
                                                 "payload": {
                                                     "title": title,
                                                     "link": link
@@ -240,7 +240,7 @@ class FakeNews:
             json={
                     "project": "db_ard",
                     "collection_name": "tagesschau",
-                    "vector": vektor[:8192],
+                    "vector": vektor,
                     "limit": 1,
                     "filter": {},
                     "score_threshold": 0.2
