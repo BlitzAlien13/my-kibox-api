@@ -145,18 +145,7 @@ class FakeNews:
             return None
         
     def ard_api(self):
-        dfd=requests.delete(
-            f"{self.api_url}/api/vector/collection/db_ard/tagesschau",
-            headers=self.headers,
-            params={
-                "project": "db_ard",
-                "collection_name": "tagesschau"
-            }
-        )
-        if dfd.status_code == 200:
-            deletus = dfd.json()
-            print(deletus)
-            create_tagesschau=requests.post(
+        create_tagesschau=requests.post(
                 f"{self.api_url}/api/vector/collection",
                 headers=self.headers,
                 json={
@@ -168,61 +157,58 @@ class FakeNews:
                     "shared_with_role": "STUDENT"
                 }
                 )
-            if create_tagesschau.status_code == 200:
-                answer = create_tagesschau.json()
-                print(answer)
-                vektor_id = str(uuid.uuid4())
+        if create_tagesschau.status_code == 200:
+            answer = create_tagesschau.json()
+            print(answer)
+            vektor_id = str(uuid.uuid4())
 
-                resp = requests.get(
-                    "https://www.tagesschau.de/api2u/homepage/",
-                    headers=self.headers,
-                )
+            resp = requests.get(
+                "https://www.tagesschau.de/api2u/homepage/",
+                headers=self.headers,
+            )
 
-                if resp.status_code != 200:
-                        print(f"Fehler (ard_api): {resp.status_code, resp.text}")
-                        return None
-                else:
-                    data = resp.json()
-                    results = data.get("news", [])
-                    if not results:
-                        return None  # keine weiteren Seiten
-                    if results:
-                        for r in results:
-                            title = r.get("title") or r.get("headline")
-                            link = r.get("shareURL") or r.get("details")
-                            if link and link.startswith("/"):
-                                link = "https://www.tagesschau.de" + link
-                            if link and title:
-                                vektor = self.calc_vector(title)
-                            
-                            if title and link and vektor:
-                                vektor_id = str(uuid.uuid4())
-                                atd=requests.post(
-                                    f"{self.api_url}/api/vector/points/upsert",
-                                    headers=self.headers,
-                                    json={
-                                            "project": "db_ard",
-                                            "collection_name": "tagesschau",
-                                            "points": [
-                                                {
-                                                "id": vektor_id,
-                                                "vector": vektor[:768],
-                                                "payload": {
-                                                    "title": title,
-                                                    "link": link
-                                                }
-                                                }
-                                            ]
-                                            }
-                                )
-                                if atd.status_code == 200:
-                                    print(f"✓ (atd) Erfolg: {atd.status_code, atd.text}")
-                                else:
-                                    print(f"✗ (atd) Fehler: {atd.status_code, atd.text}")
+            if resp.status_code != 200:
+                    print(f"Fehler (ard_api): {resp.status_code, resp.text}")
+                    return None
             else:
-                print(f"✗ (collection tagesschau) Fehler: {create_tagesschau.status_code, create_tagesschau.text}")
+                data = resp.json()
+                results = data.get("news", [])
+                if not results:
+                    return None 
+                if results:
+                    for r in results:
+                        title = r.get("title") or r.get("headline")
+                        link = r.get("shareURL") or r.get("details")
+                        if link and link.startswith("/"):
+                            link = "https://www.tagesschau.de" + link
+                        if link and title:
+                            vektor = self.calc_vector(title)
+                        
+                        if title and link and vektor:
+                            vektor_id = str(uuid.uuid4())
+                            atd=requests.post(
+                                f"{self.api_url}/api/vector/points/upsert",
+                                headers=self.headers,
+                                json={
+                                        "project": "db_ard",
+                                        "collection_name": "tagesschau",
+                                        "points": [
+                                            {
+                                            "id": vektor_id,
+                                            "vector": vektor[:768],
+                                            "payload": {
+                                                "title": title,
+                                                "link": link
+                                            }
+                                            }
+                                        ]
+                                        }
+                            )
+                            if atd.status_code == 200:
+                                print(f"✓ (atd) Erfolg: {atd.status_code, atd.text}")
         else:
-            print(f"✗ (deletus) Fehler: {atd.status_code, atd.text}")
+            print(f"✗ (collection tagesschau) Fehler: {create_tagesschau.status_code, create_tagesschau.text}")
+        
           
 
 
@@ -254,7 +240,21 @@ class FakeNews:
                     
             else:
                 print(f"✗ (monitor) Fehler: {similar_request.status_code, similar_request.text}")
-
+    def ard_deletus(self):
+        dfd=requests.delete(
+            f"{self.api_url}/api/vector/collection/db_ard/tagesschau",
+            headers=self.headers,
+            params={
+                "project": "db_ard",
+                "collection_name": "tagesschau"
+            }
+        )
+        if dfd.status_code == 200:
+            deletus = dfd.json()
+            print(deletus)
+            print(f"✗ (deletus) Fehler: {dfd.status_code, dfd.text}")
+        else:
+            print(f"✗ (dfd) Fehler: {dfd.status_code, dfd.text}")
     def wiki_api(self, text):
         wiki = requests.post(
             f"{self.api_url}/api/wikipedia-link/search",
