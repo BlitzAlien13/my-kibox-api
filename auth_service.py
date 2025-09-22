@@ -32,12 +32,12 @@ class AuthService:
         print(password_hash)
         self.db.add_user(name, klasse, geburtstag, email, password_hash)
 
-    def login_user(self, username: str, password: str) -> str:
-        user = self.db.get_user_by_username(username)
+    def login_user(self, name: str, password: str) -> str:
+        user = self.db.get_user_by_username(name)
         if not user or not self.verify_password(password, user["password_hash"]):
             raise ValueError("Invalid credentials")
         else:
             token_login=self.create_access_token({"sub": user["name"]})
-            DatabaseService.add_user_login_db(username, token_login)
+            DatabaseService.add_user_login_db(name, token_login)
         return token_login
     
