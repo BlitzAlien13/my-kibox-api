@@ -85,7 +85,7 @@ class DatabaseService:
                     print("TLogin")
 
                 else:
-                    print(f"✗ (Table_Create_Login) Fehler: {create_table_response_login.status_code}")  
+                    print(f"✗ (Table_Create_Login) Fehler: {create_table_response_login.status_code, create_table_response_login.text}")  
             else:
                 response_add = requests.post(
                     f"{self.api_url}/api/db/project",
