@@ -66,7 +66,7 @@ class DatabaseService:
                     print("TUser wurde erstellt")
 
                 else:
-                    print(f"✗ (Table_Create) Fehler: {create_table_response.status_code}")
+                    print(f"✗ (Table_Create_User) Fehler: {create_table_response.status_code}")
 
                 create_table_response_login = requests.post(
                     f"{self.api_url}/api/db/execute",
@@ -82,10 +82,10 @@ class DatabaseService:
                     }
                 )
                 if create_table_response_login.status_code == 200:
-                    print("TUser wurde erstellt")
+                    print("TLogin")
 
                 else:
-                    print(f"✗ (Table_Create) Fehler: {create_table_response_login.status_code}")  
+                    print(f"✗ (Table_Create_Login) Fehler: {create_table_response_login.status_code}")  
             else:
                 response_add = requests.post(
                     f"{self.api_url}/api/db/project",
@@ -117,7 +117,7 @@ class DatabaseService:
             if AUser.status_code == 200:
                 data = AUser.json()
                 print(f"{name} hinzugefügt")
-                
+    
     def get_user_by_username(self, username: str):
         response = requests.post(
             f"{self.api_url}/api/db/execute",
@@ -139,17 +139,17 @@ class DatabaseService:
         user_data = answer["data"][0]  
         return user_data
     
-    def add_chat(self, chat: str):
+    def add_user_login_db(self, name: str, token_login: str):
             ACser=requests.post(
                f"{self.api_url}/api/db/execute",
                 headers=self.headers,
                 json={
                     "project": "db_user",
-                    "sql": "INSERT INTO TUser (chat) VALUES (%s)",
-                    "params": [chat]
+                    "sql": "INSERT INTO TLogin (name, token_login) VALUES (%s, %s)",
+                    "params": [name, token_login]
                 }
             )
             if ACser.status_code == 200:
-                data = ACser.json()
+                print(f"User {name} hat sich eingeloggt")
                 
 
