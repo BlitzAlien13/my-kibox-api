@@ -44,56 +44,29 @@ class DatabaseService:
             project_exists = any(project.get("name") == "db_user" for project in data)
 
             if project_exists:    
-                search_table_response = requests.post(
+                create_table_response = requests.post(
                     f"{self.api_url}/api/db/execute",
                     headers=self.headers,
                     json={
                         "project": "db_user",
                         "sql": """
-                            SELECT CASE WHEN EXISTS (
-                                SELECT 1
-                                FROM INFORMATION_SCHEMA.TABLES
-                                WHERE TABLE_NAME = 'TUser'
-                            ) THEN 1 ELSE 0 END AS TableExists;
-                        """
+                            CREATE TABLE IF NOT EXISTS TUser(
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            name VARCHAR(100) NOT NULL,
+                            klasse VARCHAR(10),
+                            geburtstag DATE,
+                            email VARCHAR(100),
+                            eintrittsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            password_hash VARCHAR(255)
+                        )
+                        """ 
                     }
                 )
-                if search_table_response.status_code == 200:
-                    answer = search_table_response.json()
-                    data = answer["data"][0]["TableExists"]
-                    table_exists = bool(data)
-
-                    if table_exists:
-                        print("Table already exists")
-
-                    else:
-                        create_table_response = requests.post(
-                            f"{self.api_url}/api/db/execute",
-                            headers=self.headers,
-                            json={
-                                "project": "db_user",
-                                "sql": """
-                                    CREATE TABLE TUser(
-                                    id INT AUTO_INCREMENT PRIMARY KEY,
-                                    name VARCHAR(100) NOT NULL,
-                                    klasse VARCHAR(10),
-                                    geburtstag DATE,
-                                    email VARCHAR(100),
-                                    eintrittsdatum TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                    password_hash VARCHAR(255)
-                                )
-                                """ 
-                            }
-                        )
-                        if create_table_response.status_code == 200:
-                            print("TUser wurde erstellt")
-
-                        else:
-                            print(f"✗ (Table_Create) Fehler: {search_table_response.status_code}")
+                if create_table_response.status_code == 200:
+                    print("TUser wurde erstellt")
 
                 else:
-                    print(f"✗ (Table_Search) Fehler: {search_table_response.status_code}")
-
+                    print(f"✗ (Table_Create) Fehler: {create_table_response.status_code}")
 
             else:
                 response_add = requests.post(
@@ -103,7 +76,7 @@ class DatabaseService:
                         "name": "db_user",
                         "description": "Hier sind User gespeichert",
                         "shared_with_role": "STUDENT"
-                    }
+                    }  
                 )
                 if response_add.status_code == 200:
                     print("Datenbank angelegt")
