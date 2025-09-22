@@ -17,7 +17,7 @@ class DatabaseService:
             data = response.json()
             self.token = data["token"]
             self.headers["Authorization"] = f"Bearer {self.token}"
-            print(f"✓ db_Angemeldet als: {data['username']} ({data['role']})")
+            print(f"✓ KIB_Angemeldet als: {data['username']} ({data['role']})")
             return True
         else:
             print(f"✗ Login fehlgeschlagen: {response.json()}")
@@ -68,6 +68,24 @@ class DatabaseService:
                 else:
                     print(f"✗ (Table_Create) Fehler: {create_table_response.status_code}")
 
+                create_table_response_login = requests.post(
+                    f"{self.api_url}/api/db/execute",
+                    headers=self.headers,
+                    json={
+                        "project": "db_user",
+                        "sql": """
+                            CREATE TABLE IF NOT EXISTS TLogin(
+                            name VARCHAR(100) NOT NULL,
+                            token_login VARCHAR NOT NULL,
+                        )
+                        """ 
+                    }
+                )
+                if create_table_response_login.status_code == 200:
+                    print("TUser wurde erstellt")
+
+                else:
+                    print(f"✗ (Table_Create) Fehler: {create_table_response_login.status_code}")  
             else:
                 response_add = requests.post(
                     f"{self.api_url}/api/db/project",
@@ -99,7 +117,7 @@ class DatabaseService:
             if AUser.status_code == 200:
                 data = AUser.json()
                 print(f"{name} hinzugefügt")
-
+                
     def get_user_by_username(self, username: str):
         response = requests.post(
             f"{self.api_url}/api/db/execute",
@@ -120,6 +138,18 @@ class DatabaseService:
 
         user_data = answer["data"][0]  
         return user_data
-
-            
+    
+    def add_chat(self, chat: str):
+            ACser=requests.post(
+               f"{self.api_url}/api/db/execute",
+                headers=self.headers,
+                json={
+                    "project": "db_user",
+                    "sql": "INSERT INTO TUser (chat) VALUES (%s)",
+                    "params": [chat]
+                }
+            )
+            if ACser.status_code == 200:
+                data = ACser.json()
+                
 
