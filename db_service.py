@@ -76,7 +76,7 @@ class DatabaseService:
                         "sql": """
                             CREATE TABLE IF NOT EXISTS TLogin(
                             name VARCHAR(100) NOT NULL,
-                            token_login VARCHAR(666) NOT NULL,
+                            token_login VARCHAR NOT NULL
                         )
                         """ 
                     }
