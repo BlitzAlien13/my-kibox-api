@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
     news.login(username, password)
     db.login(username, password)
     auth.login(username, password)
+    UTraking.login(username, password)
     # Hintergrundtask starten
     task = asyncio.create_task(wiederkehrende_aufgabe())
     db.project_check()

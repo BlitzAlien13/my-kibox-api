@@ -27,7 +27,7 @@ class AuthService:
             data = response.json()
             self.token = data["token"]
             self.headers["Authorization"] = f"Bearer {self.token}"
-            print(f"✓ KIB_Angemeldet als: {data['username']} ({data['role']})")
+            print(f"✓ Auth_Angemeldet als: {data['username']} ({data['role']})")
             return True
         else:
             print(f"✗ Login fehlgeschlagen: {response.json()}")
