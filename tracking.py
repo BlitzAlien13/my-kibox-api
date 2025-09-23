@@ -10,15 +10,14 @@ class UserTracking:
         self.kibox = kibox_instance
         self.db = db
         self.at = at
-
+        self.token_login = self.at.token_login 
+        
     def set_token(self, token: str):
         """Token von KIBox übernehmen"""
         self.token = token
         self.headers["Authorization"] = f"Bearer {self.token}"
         
-    def get_user_by_token(self):
-        token_login = self.at.token_login  
-
+    def get_user_by_token(self): 
         user_id = requests.post(
             f"{self.api_url}/api/db/execute",
             headers=self.headers,
@@ -29,7 +28,7 @@ class UserTracking:
                         FROM TLogin
                         WHERE token_login = (%s);
                 """,
-                "params": [token_login]
+                "params": [self.token_login]
             }
         )
 
