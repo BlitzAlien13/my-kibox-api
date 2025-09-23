@@ -53,26 +53,31 @@ class AuthService:
             self.db.add_user_login_db(name, self.token_login, user_id)
         return self.token_login
     
-    def get_user_by_token(self): 
-            user_id = requests.post(
-                f"{self.api_url}/api/db/execute",
-                headers=self.headers,
-                json={
-                    "project": "db_user",
-                    "sql": """
-                            SELECT *
-                            FROM TLogin
-                            WHERE token_login = (%s)
-                    """,
-                    "params": [self.token_login]
-                }
-            )
+    def get_user_by_token(self):
+        if not self.token:
+            raise ValueError("Kein KIBox-Token gesetzt – bitte set_token() aufrufen")
 
-            if user_id.status_code == 200:
-                data = user_id.json()
-                print(f"User gefunden: {data}")
-            else:
-                print(f"✗ (get_user_by_token) Fehler: {user_id.status_code, user_id.text}")
+        if not self.token_login:
+            raise ValueError("Kein User-Login-Token gesetzt – bitte zuerst /login ausführen")
 
+        user_id = requests.post(
+            f"{self.api_url}/api/db/execute",
+            headers=self.headers,   
+            json={
+                "project": "db_user",
+                "sql": """
+                        SELECT *
+                        FROM TLogin
+                        WHERE token_login = (%s)
+                """,
+                "params": [self.token_login]
+            }
+        )
 
-    
+        if user_id.status_code == 200:
+            data = user_id.json()
+            print(f"✓ User gefunden: {data}")
+            return data
+        else:
+            print(f"✗ (get_user_by_token) Fehler: {user_id.status_code, user_id.text}")
+            return None
