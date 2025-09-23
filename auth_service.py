@@ -38,6 +38,6 @@ class AuthService:
             raise ValueError("Invalid credentials")
         else:
             token_login=self.create_access_token({"sub": user["name"]})
-            DatabaseService.add_user_login_db(name, token_login)
+            self.db.add_user_login_db(name, token_login)
         return token_login
     
