@@ -151,5 +151,7 @@ class DatabaseService:
             )
             if ACser.status_code == 200:
                 print(f"User {name} hat sich mit id: {user_id}eingeloggt")
+            else:
+                print(f"✗ (ACer) Fehler: {ACser.status_code, ACser.text}")
                 
 
