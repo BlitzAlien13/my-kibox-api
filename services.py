@@ -6,4 +6,4 @@ from auth_service import AuthService
 kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
 db = DatabaseService(kibox_instance=None)
-auth = AuthService(db)
+auth = AuthService()
