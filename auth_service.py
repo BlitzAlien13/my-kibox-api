@@ -12,6 +12,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 class AuthService:
     def __init__(self, db: DatabaseService):
         self.db = db
+        self.token_login = None
 
     def hash_password(self, password: str) -> str:
         return pwd_context.hash(password)    # returnt aus dem Passwort ein hash
@@ -37,9 +38,13 @@ class AuthService:
         if not user or not self.verify_password(password, user["password_hash"]):
             raise ValueError("Invalid credentials")
         else:
-            user_id=(user["id"])
-            token_login=self.create_access_token({"sub": user["name"]})
+            user_id = user["id"]
+            self.token_login = self.create_access_token({"sub": user["name"]})   # <--- speichern
             self.db.update_user_login_db(user_id)
-            self.db.add_user_login_db(name, token_login, user_id)
-        return token_login
+            self.db.add_user_login_db(name, self.token_login, user_id)
+        return self.token_login
+    
+
+
+
     
