@@ -1,9 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
-from KIBox import KIBox, FakeNews
-from db_service import DatabaseService
-from auth_service import AuthService
+from services import kibox, news, db, auth
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import os
@@ -24,12 +22,6 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
-
-kibox = KIBox(kibox_instance=None)
-news = FakeNews(kibox_instance=None)
-db = DatabaseService(kibox_instance=None)
-auth = AuthService(db)
-
 
 async def wiederkehrende_aufgabe():
     try:
