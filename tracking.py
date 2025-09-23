@@ -17,6 +17,7 @@ class UserTracking:
         self.token = token
         self.headers["Authorization"] = f"Bearer {self.token}"
         print(self.token)
+        print(self.headers)
         
     def get_user_by_token(self): 
         user_id = requests.post(
