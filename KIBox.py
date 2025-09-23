@@ -2,12 +2,10 @@ import requests
 import time
 import uuid
 from db_service import DatabaseService
-from auth_service import AuthService
+from main import auth
 
 
 db = DatabaseService(kibox_instance=None)
-auth = AuthService(db)
-
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
