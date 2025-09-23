@@ -1,7 +1,6 @@
 import requests
 import time
 import uuid
-from services import auth
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
@@ -62,11 +61,12 @@ class KIBox:
         self.conversation = []
     
 class FakeNews:
-    def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
+    def __init__(self, kibox_instance, auth_service=None, api_url="https://api.phoenix.kibox.online"):
         self.api_url = api_url
         self.token = None
         self.headers = {"Content-Type": "application/json"}
         self.kibox = kibox_instance
+        self.auth_service = auth_service  
         self.conversation = []
 
     def set_token(self, token: str):
@@ -199,14 +199,6 @@ class FakeNews:
         else:
             print(f"✗ (collection tagesschau) Fehler: {create_tagesschau.status_code, create_tagesschau.text}")
         
-          
-
-
-
-
-                
-
-    
     def run_monitor(self, message):
             text = self.extract_important(message)
             vektor = self.calc_vector(text)
@@ -259,7 +251,7 @@ class FakeNews:
             answer_wiki = wiki.json()
             AnswerUrl_wiki = answer_wiki[0]["url"]
             self.conversation.append({"role": "assistant", "content": AnswerUrl_wiki })
-            user = auth.get_user_by_token()
+            user = self.auth.get_user_by_token()
             print(f"User {user} fragt wiki ab")
             return AnswerUrl_wiki
         else:
