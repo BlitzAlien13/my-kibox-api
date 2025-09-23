@@ -1,4 +1,5 @@
 # auth_service.py
+import requests
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
@@ -13,6 +14,22 @@ class AuthService:
     def __init__(self, db: DatabaseService):
         self.db = db
         self.token_login = None
+
+    def login(self, username, password):
+        response = requests.post(
+            f"{self.api_url}/api/auth/token",
+            json={"username": username, "password": password}
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            self.token = data["token"]
+            self.headers["Authorization"] = f"Bearer {self.token}"
+            print(f"✓ KIB_Angemeldet als: {data['username']} ({data['role']})")
+            return True
+        else:
+            print(f"✗ Login fehlgeschlagen: {response.json()}")
+            return False
 
     def hash_password(self, password: str) -> str:
         return pwd_context.hash(password)    # returnt aus dem Passwort ein hash
