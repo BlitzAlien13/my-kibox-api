@@ -1,6 +1,13 @@
 import requests
 import time
 import uuid
+from db_service import DatabaseService
+from auth_service import AuthService
+from tracking import UserTracking
+
+db = DatabaseService(kibox_instance=None)
+auth = AuthService(db)
+UTraking = UserTracking(db, auth, kibox_instance=None)
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
@@ -269,6 +276,8 @@ class FakeNews:
             answer_wiki = wiki.json()
             AnswerUrl_wiki = answer_wiki[0]["url"]
             self.conversation.append({"role": "assistant", "content": AnswerUrl_wiki })
+            user = UTraking.get_user_by_token()
+            print(f"User {user} fragt wiki ab")
             return AnswerUrl_wiki
         else:
             print(f"✗ (wiki) Fehler: {wiki.status_code, wiki.text}")
