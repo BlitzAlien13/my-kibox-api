@@ -76,7 +76,8 @@ class DatabaseService:
                         "sql": """
                             CREATE TABLE IF NOT EXISTS TLogin(
                             name VARCHAR(100) NOT NULL,
-                            token_login VARCHAR(255) NOT NULL
+                            token_login VARCHAR(255) NOT NULL,
+                            id INT
                         )
                         """ 
                     }
@@ -167,6 +168,7 @@ class DatabaseService:
                     "params": [user_id]
                 }
             )
+        
         if DCser.status_code == 200:
             print(f"User hat sich mit id: {user_id} ausgeloggt")
         else:

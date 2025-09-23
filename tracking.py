@@ -28,23 +28,26 @@ class UserTracking:
             return False
         
     def get_user_by_token(self):
-        token_login = self.at.token_login 
+        token_login = self.at.token_login   # vermutlich ein String
+
         user_id = requests.post(
-               f"{self.api_url}/api/db/execute",
-                headers=self.headers,
-                json={
-                    "project": "db_user",
-                    "sql": """
-                            SELECT *
-                            FROM TLogin
-                            WHERE token_login = (%s);
-                    """,
-                    "params": [token_login]
-                }
-            )
-        name = (token_login["name"])
+            f"{self.api_url}/api/db/execute",
+            headers=self.headers,
+            json={
+                "project": "db_user",
+                "sql": """
+                        SELECT *
+                        FROM TLogin
+                        WHERE token_login = (%s);
+                """,
+                "params": [token_login]
+            }
+        )
+
         if user_id.status_code == 200:
-            print(f"User {name} mit token: {token_login}")
+            data = user_id.json()
+            print(f"User gefunden: {data}")
         else:
             print(f"✗ (get_user_by_token) Fehler: {user_id.status_code, user_id.text}")
+
 
