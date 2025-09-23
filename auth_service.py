@@ -66,7 +66,7 @@ class AuthService:
             json={
                 "project": "db_user",
                 "sql": """
-                        SELECT *
+                        SELECT id
                         FROM TLogin
                         WHERE token_login = (%s)
                 """,
