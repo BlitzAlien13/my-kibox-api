@@ -3,7 +3,7 @@ import requests
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
-from services import db
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "SUPERSECRET"
@@ -11,9 +11,8 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 class AuthService:
-    def __init__(self,db, api_url="https://api.phoenix.kibox.online"):
+    def __init__(self, api_url="https://api.phoenix.kibox.online"):
         self.api_url = api_url
-        self.db = db
         self.headers = {"Content-Type": "application/json"}
         self.token = None
         self.token_login = None
