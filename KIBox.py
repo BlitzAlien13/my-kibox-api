@@ -237,6 +237,7 @@ class FakeNews:
             print(f"✗ (deletus) Fehler: {dfd.status_code, dfd.text}")
         else:
             print(f"✗ (dfd) Fehler: {dfd.status_code, dfd.text}")
+            
     def wiki_api(self, text):
         wiki = requests.post(
             f"{self.api_url}/api/wikipedia-link/search",
