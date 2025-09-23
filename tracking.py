@@ -28,7 +28,7 @@ class UserTracking:
             return False
         
     def get_user_by_token(self):
-        token_login = self.at.token_login   # vermutlich ein String
+        token_login = self.at.token_login  
 
         user_id = requests.post(
             f"{self.api_url}/api/db/execute",

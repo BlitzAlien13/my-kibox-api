@@ -4,6 +4,7 @@ import asyncio
 from KIBox import KIBox, FakeNews
 from db_service import DatabaseService
 from auth_service import AuthService
+from tracking import UserTracking
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import os
@@ -29,6 +30,7 @@ kibox = KIBox(kibox_instance=None)
 news = FakeNews(kibox_instance=None)
 db = DatabaseService(kibox_instance=None)
 auth = AuthService(db)
+UTraking = UserTracking(db, auth, kibox_instance=None)
 
 async def wiederkehrende_aufgabe():
     try:
