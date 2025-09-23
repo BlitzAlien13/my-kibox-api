@@ -14,6 +14,7 @@ class AuthService:
     def __init__(self, db: DatabaseService, api_url="https://api.phoenix.kibox.online"):
         self.api_url = api_url
         self.db = db
+        self.headers = {"Content-Type": "application/json"}
         self.token_login = None
 
     def login(self, username, password):
