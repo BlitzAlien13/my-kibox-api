@@ -11,7 +11,8 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 class AuthService:
-    def __init__(self, db: DatabaseService):
+    def __init__(self, db: DatabaseService, api_url="https://api.phoenix.kibox.online"):
+        self.api_url = api_url
         self.db = db
         self.token_login = None
 
