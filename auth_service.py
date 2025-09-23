@@ -75,7 +75,7 @@ class AuthService:
         )
 
         if user_id.status_code == 200:
-            data = user_id.json()
+            data = user_id.json("data"["id"])
             print(f"✓ User gefunden: {data}")
             return data
         else:
