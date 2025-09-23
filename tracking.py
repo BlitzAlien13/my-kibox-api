@@ -16,6 +16,7 @@ class UserTracking:
         """Token von KIBox übernehmen"""
         self.token = token
         self.headers["Authorization"] = f"Bearer {self.token}"
+        print(self.token)
         
     def get_user_by_token(self): 
         user_id = requests.post(
