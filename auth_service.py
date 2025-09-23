@@ -15,7 +15,8 @@ class AuthService:
         self.api_url = api_url
         self.db = db
         self.headers = {"Content-Type": "application/json"}
-        self.token_login = None
+        self.token = None
+        self.token_login
 
     def set_token(self, token: str):
         """Token von KIBox übernehmen"""
