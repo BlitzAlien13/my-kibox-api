@@ -139,17 +139,17 @@ class DatabaseService:
         user_data = answer["data"][0]  
         return user_data
     
-    def add_user_login_db(self, name: str, token_login: str):
+    def add_user_login_db(self, name: str, token_login: str, user_id: int):
             ACser=requests.post(
                f"{self.api_url}/api/db/execute",
                 headers=self.headers,
                 json={
                     "project": "db_user",
-                    "sql": "INSERT INTO TLogin (name, token_login) VALUES (%s, %s)",
-                    "params": [name, token_login]
+                    "sql": "INSERT INTO TLogin (name, token_login, user_id) VALUES (%s, %s, %s)",
+                    "params": [name, token_login, user_id]
                 }
             )
             if ACser.status_code == 200:
-                print(f"User {name} hat sich eingeloggt")
+                print(f"User {name} hat sich mit id: {user_id}eingeloggt")
                 
 
