@@ -43,12 +43,21 @@ async def wiederkehrende_aufgabe():
         print("Wiederkehrende Aufgabe beendet")
 
 async def lifespan(app: FastAPI):
-    # Startup
+    # EIN Login bei KIBox
     kibox.login(username, password)
-    news.login(username, password)
-    db.login(username, password)
-    auth.login(username, password)
-    UTraking.login(username, password)
+    
+    # Den KIBox-Token an alle weitergeben
+    token = kibox.token
+    news.token = token
+    db.token = token
+    auth.token = token
+    UTraking.token = token
+
+    # Header gleich mit übergeben
+    news.headers = {"Authorization": f"Bearer {token}"}
+    db.headers = {"Authorization": f"Bearer {token}"}
+    auth.headers = {"Authorization": f"Bearer {token}"}
+    UTraking.headers = {"Authorization": f"Bearer {token}"}
     # Hintergrundtask starten
     task = asyncio.create_task(wiederkehrende_aufgabe())
     db.project_check()

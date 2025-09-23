@@ -17,21 +17,10 @@ class AuthService:
         self.headers = {"Content-Type": "application/json"}
         self.token_login = None
 
-    def login(self, username, password):
-        response = requests.post(
-            f"{self.api_url}/api/auth/token",
-            json={"username": username, "password": password}
-        )
-
-        if response.status_code == 200:
-            data = response.json()
-            self.token = data["token"]
-            self.headers["Authorization"] = f"Bearer {self.token}"
-            print(f"✓ Auth_Angemeldet als: {data['username']} ({data['role']})")
-            return True
-        else:
-            print(f"✗ Login fehlgeschlagen: {response.json()}")
-            return False
+    def set_token(self, token: str):
+        """Token von KIBox übernehmen"""
+        self.token = token
+        self.headers["Authorization"] = f"Bearer {self.token}"
 
     def hash_password(self, password: str) -> str:
         return pwd_context.hash(password)    # returnt aus dem Passwort ein hash
