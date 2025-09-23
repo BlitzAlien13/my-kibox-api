@@ -48,16 +48,12 @@ async def lifespan(app: FastAPI):
     
     # Den KIBox-Token an alle weitergeben
     token = kibox.token
-    news.token = token
-    db.token = token
-    auth.token = token
-    UTraking.token = token
-
-    # Header gleich mit übergeben
-    news.headers = {"Authorization": f"Bearer {token}"}
-    db.headers = {"Authorization": f"Bearer {token}"}
-    auth.headers = {"Authorization": f"Bearer {token}"}
-    UTraking.headers = {"Authorization": f"Bearer {token}"}
+    
+    # Header gleich mit 
+    news.set_token(token)
+    db.set_token(token)
+    auth.set_token(token)
+    UTraking.set_token(token)
     # Hintergrundtask starten
     task = asyncio.create_task(wiederkehrende_aufgabe())
     db.project_check()
