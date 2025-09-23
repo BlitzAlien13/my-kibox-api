@@ -10,7 +10,7 @@ class UserTracking:
         self.kibox = kibox_instance
         self.db = db
         self.at = at
-        self.token_login = self.at.token_login 
+        
         
     def set_token(self, token: str):
         """Token von KIBox übernehmen"""
@@ -30,7 +30,7 @@ class UserTracking:
                         FROM TLogin
                         WHERE token_login = (%s);
                 """,
-                "params": [self.token_login]
+                "params": [self.at.token_login]
             }
         )
 
@@ -39,5 +39,3 @@ class UserTracking:
             print(f"User gefunden: {data}")
         else:
             print(f"✗ (get_user_by_token) Fehler: {user_id.status_code, user_id.text}")
-
-
