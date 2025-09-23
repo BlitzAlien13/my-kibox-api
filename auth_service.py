@@ -37,8 +37,9 @@ class AuthService:
         if not user or not self.verify_password(password, user["password_hash"]):
             raise ValueError("Invalid credentials")
         else:
-            id_user=(user["id"])
+            user_id=(user["id"])
             token_login=self.create_access_token({"sub": user["name"]})
-            self.db.add_user_login_db(name, token_login, id_user)
+            self.db.update_user_login_db(user_id)
+            self.db.add_user_login_db(name, token_login, user_id)
         return token_login
     

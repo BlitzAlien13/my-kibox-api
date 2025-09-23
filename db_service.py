@@ -145,13 +145,29 @@ class DatabaseService:
                 headers=self.headers,
                 json={
                     "project": "db_user",
-                    "sql": "INSERT INTO TLogin (name, token_login, user_id) VALUES (%s, %s, %s)",
+                    "sql": "INSERT INTO TLogin (name, token_login, id) VALUES (%s, %s, %s)",
                     "params": [name, token_login, user_id]
                 }
             )
             if ACser.status_code == 200:
-                print(f"User {name} hat sich mit id: {user_id}eingeloggt")
+                print(f"User {name} hat sich mit id: {user_id} eingeloggt")
             else:
                 print(f"✗ (ACer) Fehler: {ACser.status_code, ACser.text}")
                 
-
+    def update_user_login_db(self, user_id: int):
+        DCser=requests.post(
+               f"{self.api_url}/api/db/execute",
+                headers=self.headers,
+                json={
+                    "project": "db_user",
+                    "sql": """
+                            DELETE FROM TLogin
+                            WHERE id = (%s);
+                    """,
+                    "params": [user_id]
+                }
+            )
+        if DCser.status_code == 200:
+            print(f"User hat sich mit id: {user_id} ausgeloggt")
+        else:
+            print(f"✗ (ACer) Fehler: {DCser.status_code, DCser.text}")
