@@ -251,7 +251,7 @@ class FakeNews:
             answer_wiki = wiki.json()
             AnswerUrl_wiki = answer_wiki[0]["url"]
             self.conversation.append({"role": "assistant", "content": AnswerUrl_wiki })
-            user = self.auth.get_user_by_token()
+            user = self.auth_service.get_user_by_token()
             print(f"User {user} fragt wiki ab")
             return AnswerUrl_wiki
         else:
