@@ -28,7 +28,7 @@ class UserTracking:
                 "sql": """
                         SELECT *
                         FROM TLogin
-                        WHERE token_login = (%s);
+                        WHERE token_login = (%s)
                 """,
                 "params": [self.at.token_login]
             }
