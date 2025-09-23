@@ -1,7 +1,7 @@
 import requests
 import time
 import uuid
-from services import auth, db
+from services import auth
 
 class KIBox:
     def __init__(self, kibox_instance, api_url="https://api.phoenix.kibox.online"):
