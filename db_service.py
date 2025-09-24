@@ -89,7 +89,6 @@ class DatabaseService:
                             sender VARCHAR(50),        
                             message TEXT,
                             timestamp TIMESTAMP DEFAULT now(),
-                            FOREIGN KEY (user_id) REFERENCES TUSer(id)
                             );
                             """
                     }
@@ -184,8 +183,3 @@ class DatabaseService:
             print(f"User hat sich mit id: {user_id} ausgeloggt")
         else:
             print(f"✗ (ACer) Fehler: {DCser.status_code, DCser.text}")
-    
-    
-
-        
-
