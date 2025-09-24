@@ -15,14 +15,14 @@ username = os.getenv("KIBOX_USER")
 password = os.getenv("KIBOX_PASS")
 security = HTTPBearer()
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+def get_current_user(application, credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     try:
         user_id=auth.get_user_by_token(token)
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token: no subject")
         
-        print(f"{user_id} führt Aktion aus")
+        print(f"{user_id} führt Aktion {application} aus")
         return user_id
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -114,7 +114,7 @@ def login(data: LoginRequest):
         raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/chat")
-async def chat(request: Request, user_id: int = Depends(get_current_user)):
+async def chat(request: Request, user_id: int = Depends(get_current_user("chat"))):
     data = await request.json()
     message = data.get("message")
     if not kibox.token:
@@ -123,7 +123,7 @@ async def chat(request: Request, user_id: int = Depends(get_current_user)):
     return {"reply": response, "user_id": user_id}
 
 @app.post("/wiki")
-async def wiki(request: Request, user_id: int = Depends(get_current_user)):
+async def wiki(request: Request, user_id: int = Depends(get_current_user("wiki"))):
     data = await request.json()
     message = data.get("message")
     if not news.token:
@@ -132,7 +132,7 @@ async def wiki(request: Request, user_id: int = Depends(get_current_user)):
     return {"reply": response, "user_id": user_id}
 
 @app.post("/ard")
-async def ard(request: Request, user_id: int = Depends(get_current_user)):
+async def ard(request: Request, user_id: int = Depends(get_current_user("ard"))):
     data = await request.json()
     message = data.get("message")
     if not news.token:
