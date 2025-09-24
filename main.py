@@ -126,7 +126,7 @@ async def chat(request: Request, user_id: int = Depends(get_current_user)):
 async def wiki(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
-    if not kibox.token:
+    if not news.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.news_checker(message)
     return {"reply": response, "user_id": user_id}
@@ -135,7 +135,7 @@ async def wiki(request: Request, user_id: int = Depends(get_current_user)):
 async def ard(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
-    if not kibox.token:
+    if not news.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.run_monitor(message)
     print(response)
