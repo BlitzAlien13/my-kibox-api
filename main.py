@@ -147,3 +147,20 @@ async def similar(request: Request):
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.similar(message)
     return {"reply": response}
+
+@app.post("/add_chat")
+async def add_chat(user_id: int = Depends(get_current_user_for("add_chat_TChats"))):
+    if not news.token:
+        return {"error": "Bitte zuerst einloggen (/login)"}
+    news.add_chat_TChats(user_id)
+    return {"msg": f"Chats für User {user_id} gespeichert"}
+
+@app.get("/user_chats")
+async def get_user_chats(user_id: int = Depends(get_current_user_for("get_user_chats"))):
+    """
+    Gibt alle Chats eines Users zurück.
+    """
+    if not news.token:
+        return {"error": "Bitte zuerst einloggen (/login)"}
+    chats = news.get_user_chats(user_id)
+    return {"user_id": user_id, "chats": chats}

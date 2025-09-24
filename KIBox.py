@@ -280,8 +280,52 @@ class FakeNews:
             print(f"✗ (response) Fehler: {response.status_code, response.text}")
 
 
+    def add_chat_TChats(self, user_id):
+        chats = self.conversation
+        converted = [{'sender': chat['role'], 'message': chat['content']} for chat in chats] 
+        for chat in converted:
+            CTdb = requests.post(
+                f"{self.api_url}/api/db/execute",
+                headers=self.headers,
+                json={
+                    "project": "db_user",
+                    "sql": """
+                        INSERT INTO TChats(user_id, sender, message)
+                        VALUES (%s, %s, %s)
+                    """,
+                    "params": [user_id, chat['sender'], chat['message']]
+                }
+            )
+            if CTdb.status_code == 200:
+                print(f"✓ User {user_id}: Chat gespeichert -> {chat}")
+            else:
+                print(f"✗ Fehler beim Speichern: {CTdb.status_code} {CTdb.text}")
 
+    def get_user_chats(self, user_id: int):
+        response = requests.post(
+            f"{self.api_url}/api/db/execute",
+            headers=self.headers,
+            json={
+                "project": "db_user",
+                "sql": """
+                    SELECT sender, message
+                    FROM TChats
+                    WHERE user_id = %s
+                    ORDER BY id DESC
+                """,
+                "params": [user_id]
+            }
+        )
 
-kibox = KIBox(kibox_instance=None)
-checker = FakeNews(kibox_instance=None)
+        if response.status_code == 200:
+            result = response.json()
+            # Je nach API liefert result evtl. ein "rows"-Feld
+            chats = result.get("rows", [])
+            for chat in chats:
+                print(chat)
+            return chats
+        else:
+            print(f"✗ Fehler beim Abrufen: {response.status_code} {response.text}")
+            return []
+
 

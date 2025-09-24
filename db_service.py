@@ -76,6 +76,28 @@ class DatabaseService:
 
                 else:
                     print(f"✗ (Table_Create_Login) Fehler: {create_table_response_login.status_code, create_table_response_login.text}")  
+
+                create_table_response_chats = requests.post(
+                    f"{self.api_url}/api/db/execute",
+                    headers=self.headers,
+                    json={
+                        "project": "db_user",
+                        "sql": """
+                            CREATE TABLE IF NOT EXISTS TChats(
+                            id SERIAL PRIMARY KEY,
+                            user_id INT NOT NULL,
+                            sender VARCHAR(50),        
+                            message TEXT,
+                            timestamp TIMESTAMP DEFAULT now(),
+                            FOREIGN KEY (user_id) REFERENCES TUSer(id)
+                            );
+                            """
+                    }
+                )
+                if create_table_response_chats.status_code == 200:
+                    print("TChats")
+                else:
+                    print(f"✗ (Table_Create_Chats) Fehler: {create_table_response_chats.status_code, create_table_response_chats.text}")
             else:
                 response_add = requests.post(
                     f"{self.api_url}/api/db/project",
@@ -162,3 +184,8 @@ class DatabaseService:
             print(f"User hat sich mit id: {user_id} ausgeloggt")
         else:
             print(f"✗ (ACer) Fehler: {DCser.status_code, DCser.text}")
+    
+    
+
+        
+
