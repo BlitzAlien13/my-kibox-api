@@ -81,6 +81,7 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "https://faktenchecker.netlify.app",
     "https://faktenchecker.netlify.app/",
+    "https://faktenchecker.netlify.app/chat.html",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
