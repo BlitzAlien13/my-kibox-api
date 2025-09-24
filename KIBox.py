@@ -30,6 +30,7 @@ class KIBox:
         self.conversation.append({"role": "system", "content": content})
 
     def chat(self, message, temperature=0.7, max_tokens=500):
+        self.add_system_message("Du bist ein hochpräzises Faktenprüfungs-LLM. Antworte sofort auf Fragen, ohne Begrüßungen oder Füllworte. Gib präzise, sachliche Antworten in etwa 400 Zeichen. Prüfe Informationen kritisch, stütze dich auf zuverlässige Quellen und liefere nur gesicherte Fakten. Vermeide persönliche Meinungen oder Spekulationen.")
         self.conversation.append({"role": "user", "content": message})
 
         response = requests.post(
