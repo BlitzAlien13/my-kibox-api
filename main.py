@@ -114,7 +114,7 @@ def login(data: LoginRequest):
         raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/chat")
-async def chat(request: Request, user_id: int = Depends(get_current_user("chat"))):
+async def chat(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not kibox.token:
@@ -123,7 +123,7 @@ async def chat(request: Request, user_id: int = Depends(get_current_user("chat")
     return {"reply": response, "user_id": user_id}
 
 @app.post("/wiki")
-async def wiki(request: Request, user_id: int = Depends(get_current_user("wiki"))):
+async def wiki(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not news.token:
@@ -132,7 +132,7 @@ async def wiki(request: Request, user_id: int = Depends(get_current_user("wiki")
     return {"reply": response, "user_id": user_id}
 
 @app.post("/ard")
-async def ard(request: Request, user_id: int = Depends(get_current_user("ard"))):
+async def ard(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not news.token:
