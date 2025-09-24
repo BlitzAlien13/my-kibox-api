@@ -24,10 +24,10 @@ class AuthService:
         self.headers["Authorization"] = f"Bearer {self.token}"
 
     def hash_password(self, password: str) -> str:
-        return pwd_context.hash(password)    # returnt aus dem Passwort ein hash
+        return pwd_context.hash(password)   
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)    #überprüft das eingegebene Passwort mit dem hash in der Datnebank
+        return pwd_context.verify(plain_password, hashed_password)    
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
@@ -48,7 +48,7 @@ class AuthService:
             raise ValueError("Invalid credentials")
         else:
             user_id = user["id"]
-            self.token_login = self.create_access_token({"sub": user["name"]})   # <--- speichern
+            self.token_login = self.create_access_token({"sub": user["name"]})   
             self.db.update_user_login_db(user_id)
             self.db.add_user_login_db(name, self.token_login, user_id)
         return self.token_login

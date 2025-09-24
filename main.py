@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import asyncio
 from services import kibox, news, db, auth
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from jose import jwt, JWTError, ExpiredSignatureError
 import os
 
 
@@ -11,6 +13,22 @@ load_dotenv()
 
 username = os.getenv("KIBOX_USER")
 password = os.getenv("KIBOX_PASS")
+security = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        user_id=auth.get_user_by_token(token)
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token: no subject")
+        
+        print(f"{user_id} führt Aktion aus")
+        return user_id
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
 
 class RegisterRequest(BaseModel):
     name: str
@@ -96,32 +114,32 @@ def login(data: LoginRequest):
         raise HTTPException(status_code=400, detail=str(e))
     
 @app.post("/chat")
-async def chat(request: Request):
+async def chat(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = kibox.chat(message)
-    return {"reply": response}
+    return {"reply": response, "user_id": user_id}
 
 @app.post("/wiki")
-async def wiki(request: Request):
+async def wiki(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.news_checker(message)
-    return {"reply": response}
+    return {"reply": response, "user_id": user_id}
 
 @app.post("/ard")
-async def ard(request: Request):
+async def ard(request: Request, user_id: int = Depends(get_current_user)):
     data = await request.json()
     message = data.get("message")
     if not kibox.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     response = news.run_monitor(message)
     print(response)
-    return {"reply": response}
+    return {"reply": response, "user_id": user_id}
 
 @app.post("/similar")
 async def similar(request: Request):
