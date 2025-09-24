@@ -88,7 +88,7 @@ class DatabaseService:
                             user_id INT NOT NULL,
                             sender VARCHAR(50),        
                             message TEXT,
-                            timestamp TIMESTAMP DEFAULT now(),
+                            timestamp TIMESTAMP DEFAULT now()
                             );
                             """
                     }

@@ -298,6 +298,7 @@ class FakeNews:
             )
             if CTdb.status_code == 200:
                 print(f"✓ User {user_id}: Chat gespeichert -> {chat}")
+                self.conversation = []
             else:
                 print(f"✗ Fehler beim Speichern: {CTdb.status_code} {CTdb.text}")
 
