@@ -328,8 +328,7 @@ class FakeNews:
 
         if response.status_code == 200:
             result = response.json()
-            # Je nach API liefert result evtl. ein "rows"-Feld
-            chats = result.get("rows", [])
+            chats = result.get("data", [])
             for chat in chats:
                 print(chat)
             return chats
