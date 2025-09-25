@@ -163,4 +163,4 @@ async def get_user_chats(user_id: int = Depends(get_current_user_for("get_user_c
     if not news.token:
         return {"error": "Bitte zuerst einloggen (/login)"}
     chats = news.get_user_chats(user_id)
-    return {"user_id": user_id, "chats": chats}
+    return {"chats": chats}
