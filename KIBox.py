@@ -309,7 +309,8 @@ class FakeNews:
             else:
                 print(f"✗ Fehler beim Speichern: {CTdb.status_code} {CTdb.text}")
 
-    def get_user_chats(self, user_id: int):
+    def get_user_chats(self, user_id):
+        real_user_id = user_id['id']
         response = requests.post(
             f"{self.api_url}/api/db/execute",
             headers=self.headers,
@@ -321,7 +322,7 @@ class FakeNews:
                     WHERE user_id = %s
                     ORDER BY id DESC
                 """,
-                "params": [user_id]
+                "params": [real_user_id]
             }
         )
 
