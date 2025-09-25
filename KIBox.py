@@ -289,6 +289,7 @@ class FakeNews:
         for chat in converted:
             sender = chat['sender']
             message = chat['message']
+            real_user_id = user_id['id']
             print(sender, message)
             CTdb = requests.post(
                 f"{self.api_url}/api/db/execute",
@@ -299,7 +300,7 @@ class FakeNews:
                         INSERT INTO TChats(user_id, sender, message)
                         VALUES (%s, %s, %s)
                     """,
-                    "params": [user_id, sender, message]
+                    "params": [real_user_id, sender, message]
                 }
             )
             if CTdb.status_code == 200:
