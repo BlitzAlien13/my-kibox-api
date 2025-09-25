@@ -203,26 +203,29 @@ class FakeNews:
     def run_monitor(self, message):
             text = self.extract_important(message)
             vektor = self.calc_vector(text)
-            similar_request = requests.post(
-            f"{self.api_url}/api/vector/search/similar",
-            headers=self.headers,
-            json={
-                    "project": "db_ard",
-                    "collection_name": "tagesschau",
-                    "vector": vektor[:768],
-                    "limit": 1,
-                    "filter": {},
-                    "score_threshold": 0.2
-            }
-        )
-            if similar_request.status_code == 200:
-                    answer = similar_request.json()
-                    link = answer["data"][0]["payload"]["link"]
-                    self.conversation.append({"role": "assistant", "content": link })
-                    return link
-                    
+            if vektor:
+                similar_request = requests.post(
+                f"{self.api_url}/api/vector/search/similar",
+                headers=self.headers,
+                json={
+                        "project": "db_ard",
+                        "collection_name": "tagesschau",
+                        "vector": vektor[:768],
+                        "limit": 1,
+                        "filter": {},
+                        "score_threshold": 0.2
+                }
+            )
+                if similar_request.status_code == 200:
+                        answer = similar_request.json()
+                        link = answer["data"][0]["payload"]["link"]
+                        self.conversation.append({"role": "assistant", "content": link })
+                        return link
+                        
+                else:
+                    print(f"✗ (monitor) Fehler: {similar_request.status_code, similar_request.text}")
             else:
-                print(f"✗ (monitor) Fehler: {similar_request.status_code, similar_request.text}")
+                print(f"✗ (monitor) Fehler: Kein Vektor für Wiki")
     def ard_deletus(self):
         dfd=requests.delete(
             f"{self.api_url}/api/vector/collection/db_ard/tagesschau",
@@ -286,6 +289,7 @@ class FakeNews:
         for chat in converted:
             sender = chat['sender']
             message = chat['message']
+            print(sender, message)
             CTdb = requests.post(
                 f"{self.api_url}/api/db/execute",
                 headers=self.headers,
