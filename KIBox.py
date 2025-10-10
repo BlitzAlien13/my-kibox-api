@@ -225,6 +225,7 @@ class FakeNews:
                     print(f"✗ (monitor) Fehler: {similar_request.status_code, similar_request.text}")
             else:
                 print(f"✗ (monitor) Fehler: Kein Vektor für Wiki")
+
     def ard_deletus(self):
         dfd=requests.delete(
             f"{self.api_url}/api/vector/collection/db_ard/tagesschau",
@@ -241,7 +242,8 @@ class FakeNews:
         else:
             print(f"✗ (dfd) Fehler: {dfd.status_code, dfd.text}")
             
-    def wiki_api(self, text):
+    def wiki_api(self, message):
+        text = self.extract_important(message)
         wiki = requests.post(
             f"{self.api_url}/api/wikipedia-link/search",
             headers=self.headers,
