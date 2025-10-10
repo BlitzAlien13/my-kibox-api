@@ -84,16 +84,24 @@ class FakeNews:
         extract = requests.post(
             f"{self.api_url}/api/keyterms/extract",
             headers=self.headers,
-            json={
-                "text": text
-            }
+            json={"text": text}
         )
+
         if extract.status_code == 200:
-                
-                answer = extract.json()
-                important = answer["research_terms"][0]
-                return important
-        
+            answer = extract.json()
+            research_terms = answer.get("research_terms", [])
+
+            if research_terms and isinstance(research_terms[0], str):
+                return research_terms[0]
+            else:
+                # Fallback: gib einfach den ursprünglichen Text zurück
+                print("⚠️ extract_important: keine research_terms gefunden, fallback auf original text")
+                return text
+
+        else:
+            print(f"⚠️ extract_important Fehler: {extract.status_code} - {extract.text}")
+            return text
+
     def calc_vector(self, text):
         response = requests.post(
             f"{self.api_url}/api/embedding/embeddings",
